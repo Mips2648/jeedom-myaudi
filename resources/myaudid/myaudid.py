@@ -107,6 +107,7 @@ try:
     logon_service = Services.LogonService(api)
     if not logon_service.restore_token():
         logon_service.login(args.user, args.pswd)
+
     car_service = Services.CarService(api)
     vehiclesResponse = car_service.get_vehicles()
     for vehicle in vehiclesResponse.vehicles:
@@ -117,6 +118,11 @@ try:
         tmp["registered"] = vehicle.registered
         tmp["data"] = data.get('getVehicleDataResponse')
         jeedomCom.send_change_immediate(tmp)
+
+        # usrinfo = Services.VehicleStatusReportService(api, vehicle).get_information()
+        # tmp = {}
+        # tmp["usrinfo"] = usrinfo.get()
+        # jeedomCom.send_change_immediate(tmp)
 
 
     listen()

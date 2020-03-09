@@ -21,6 +21,8 @@ require_once __DIR__ . '/../../../../core/php/core.inc.php';
 
 class myaudi extends eqLogic {
 
+	private static $PICTURES_DIR = __DIR__ . "/../pictures/";
+
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = __CLASS__;
@@ -84,7 +86,6 @@ class myaudi extends eqLogic {
 		sleep(1);
 	}
 
-
 	public static function createVehicle($vehicle) {
 		$eqLogic = eqLogic::byLogicalId($vehicle['vehicle'], __CLASS__);
 		if (!is_object($eqLogic)) {
@@ -98,9 +99,13 @@ class myaudi extends eqLogic {
 		$eqLogic->setName($vehicle['data']['VehicleSpecification']['ModelCoding']['@name']);
 		$eqLogic->save();
 
-		mkdir(__DIR__ . "/../pictures/", 0777, true);
-		$filepath = __DIR__ . "/../pictures/{$vehicle['vehicle']}-{$vehicle['csid']}.png";
-		file_put_contents($filepath, file_get_contents($vehicle['data']['Vehicle']['LifeData']['MediaData'][0]['URL']));
+		if (!file_exists(myaudi::$PICTURES_DIR)) {
+			mkdir(myaudi::$PICTURES_DIR, 0777, true);
+		}
+		$filepath = myaudi::$PICTURES_DIR.$vehicle['vehicle'].'-'.$vehicle['csid'].'.png';
+		if (!file_exists($filepath)) {
+			file_put_contents($filepath, file_get_contents($vehicle['data']['Vehicle']['LifeData']['MediaData'][0]['URL']));
+		}
 	}
 
 	public function preInsert() {
@@ -136,10 +141,10 @@ class myaudi extends eqLogic {
 	}
 
 	public function getImage($returnPluginIcon = true) {
-		$model = "{$this->getLogicalId()}-{$this->getConfiguration('csid')}";
-		log::add(__CLASS__, 'debug', "get image for model {$model}");
-		if (file_exists(__DIR__."/../pictures/{$model}.png")) {
-			return "plugins/myaudi/core/pictures/{$model}.png";
+		$file = "{$this->getLogicalId()}-{$this->getConfiguration('csid')}.png";
+		log::add(__CLASS__, 'debug', "get image {$file}");
+		if (file_exists(myaudi::$PICTURES_DIR.$file)) {
+			return "plugins/myaudi/core/pictures/{$file}";
 		}
 		log::add(__CLASS__, 'debug', "not found?");
 		if ($returnPluginIcon) {
