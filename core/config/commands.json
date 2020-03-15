@@ -1,0 +1,186 @@
+{
+    "vehicle": [
+        {
+            "logicalId": "refresh",
+            "name": "Rafraichir",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "UTC_TIME_AND_KILOMETER_STATUS",
+            "name": "Kilométrage",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "MAINTENANCE_INTERVAL_DISTANCE_TO_OIL_CHANGE",
+            "name": "Prochaine vidange huile (km)",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "MAINTENANCE_INTERVAL_TIME_TO_OIL_CHANGE",
+            "name": "Prochaine vidange huile (jours)",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "jours",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "MAINTENANCE_INTERVAL_DISTANCE_TO_INSPECTION",
+            "name": "Prochain entretien (km)",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "MAINTENANCE_INTERVAL_TIME_TO_INSPECTION",
+            "name": "Prochain entretien (jours)",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "jours",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "TEMPERATURE_OUTSIDE",
+            "name": "Température extérieur",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 1,
+            "unite": "°C",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "WARNING_OIL_CHANGE",
+            "name": "Avertissement changement huile",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OIL_LEVEL_AMOUNT_IN_LITERS",
+            "name": "Niveau huile",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "l",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OIL_LEVEL_MINIMUM_WARNING",
+            "name": "Avertissement niveau huile",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OIL_LEVEL_DIPSTICKS_PERCENTAGE",
+            "name": "Pourcentage niveau huile",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "%",
+            "configuration": {
+                "minValue" : 0,
+                "maxValue" : 100
+            },
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "ADBLUE_RANGE",
+            "name": "Autonomie AdBlue",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "TOTAL_RANGE",
+            "name": "Autonomie totale",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "TANK_LEVEL_IN_PERCENTAGE",
+            "name": "Pourcentage niveau réservoir",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "%",
+            "configuration": {
+                "minValue" : 0,
+                "maxValue" : 100
+            },
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        }
+    ]
+}
