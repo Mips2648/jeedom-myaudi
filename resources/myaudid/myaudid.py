@@ -105,9 +105,12 @@ try:
 
     api = API.API()
     logon_service = Services.LogonService(api)
+    logging.debug('try restore token...')
     if not logon_service.restore_token():
+        logging.debug('login and get new token')
         logon_service.login(args.user, args.pswd)
 
+    logging.debug('Get vehicles...')
     car_service = Services.CarService(api)
     vehiclesResponse = car_service.get_vehicles()
     for vehicle in vehiclesResponse.vehicles:
@@ -119,11 +122,14 @@ try:
         tmp["data"] = data.get('getVehicleDataResponse')
         jeedomCom.send_change_immediate(tmp)
 
-        # usrinfo = Services.VehicleStatusReportService(api, vehicle).get_information()
-        # tmp = {}
-        # tmp["usrinfo"] = usrinfo.get()
-        # jeedomCom.send_change_immediate(tmp)
+        logging.debug('Get vehicle data...')
+        vehicleData = Services.VehicleStatusReportService(api, vehicle).get_stored_vehicle_data()
+        tmp = {}
+        tmp["vehicleData"] = vehicle.vin
+        for data in vehicleData.data_fields:
+            tmp[data.name] = data.value
 
+        jeedomCom.send_change_immediate(tmp)
 
     listen()
 
