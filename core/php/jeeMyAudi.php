@@ -35,13 +35,11 @@ try {
     if (isset($result['vehicle'])) {
         myaudi::createVehicle($result);
     } elseif (isset($result['vehicleData'])) {
-        $eqLogic = eqLogic::byLogicalId($vehicle['vehicleData'], 'myaudi');
+        $eqLogic = eqLogic::byLogicalId($result['vehicleData'], 'myaudi');
         if (!is_object($eqLogic)) {
-            log::add('myaudi', 'warning', 'Unknown vehicle received ?');
+            log::add('myaudi', 'warning', "Unknown vehicle received {$result['vehicleData']}");
         }
-        foreach ($result as $key => $value) {
-            $eqLogic->checkAndUpdateCmd($key, $value);
-        }
+        $eqLogic->updateVehicleData($result);
     } else {
         log::add('myaudi', 'error', 'unknown message received from daemon');
         foreach ($result as $key => $value) {

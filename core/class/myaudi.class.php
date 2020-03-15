@@ -169,6 +169,15 @@ class myaudi extends eqLogic {
 		sleep(1);
 	}
 
+	public static function sendToDaemon($params) {
+		$params['apikey'] = jeedom::getApiKey(__CLASS__);
+		$payLoad = json_encode($params);
+		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
+		socket_connect($socket, '127.0.0.1', config::byKey('socketport', __CLASS__, '55066'));
+		socket_write($socket, $payLoad, strlen($payLoad));
+		socket_close($socket);
+	}
+
 	public static function createVehicle($vehicle) {
 		$eqLogic = eqLogic::byLogicalId($vehicle['vehicle'], __CLASS__);
 		if (!is_object($eqLogic)) {
@@ -192,6 +201,21 @@ class myaudi extends eqLogic {
 
 		$commands = self::getCommandsConfig('commands.json');
 		$eqLogic->createCmdFromDef($commands['vehicle']);
+	}
+
+	public function updateVehicleData($data) {
+		foreach ($data as $key => $value) {
+			switch ($key) {
+				case 'TEMPERATURE_OUTSIDE':
+					$celcius = ($value/10)-273.15;
+					$this->checkAndUpdateCmd($key, $celcius);
+					break;
+				default:
+					$this->checkAndUpdateCmd($key, $value);
+					break;
+			}
+
+		}
 	}
 
 	public function preInsert() {
@@ -242,43 +266,10 @@ class myaudi extends eqLogic {
 
 class myaudiCmd extends cmd {
 
-	public function preSave() {
-		if ($this->getSubtype() == 'message') {
-			$this->setDisplay('title_disable', 1);
-		}
-	}
-
-	private static function sendToDaemon($params) {
-		$params['apikey'] = jeedom::getApiKey(__CLASS__);
-		$payLoad = json_encode($params);
-		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
-		socket_connect($socket, '127.0.0.1', config::byKey('socketport', __CLASS__, '55066'));
-		socket_write($socket, $payLoad, strlen($payLoad));
-		socket_close($socket);
-	}
-
 	public function execute($_options = array()) {
 		$eqlogic = $this->getEqLogic();
 
-		log::add(__CLASS__, 'debug', "sendMessage");
-		if ($this->getLogicalId()!='sendMessage') {
-			$message = "@{$this->getName()} ";
-		}
-		$message .= $_options['message'];
-		if (isset($_options['answer'])) {
-			$message .= "\n".__('Réponses attendues: ', __FILE__) . implode(', ', $_options['answer']);
-		}
-
-		if (isset($_options['files']) && is_array($_options['files'])) {
-			log::add(__CLASS__, 'debug', "Adding files to message");
-			foreach ($_options['files'] as $filepath) {
-				$params = array('method' => 'sendFile', 'room' => $eqlogic->getLogicalId(), 'message' => $message, 'description' => $_options['title'], 'file' => $filepath);
-				self::sendToDaemon($params);
-			}
-			return;
-		}
-
-		$params = array('method' => 'sendMessage', 'room' => $eqlogic->getLogicalId(), 'message' => $message);
-		self::sendToDaemon($params);
+		$params = array('method' => 'getVehicleData', 'vin' => $eqlogic->getLogicalId());
+		myaudi::sendToDaemon($params);
 	}
 }

@@ -37,6 +37,10 @@ try {
 		);
 
 		ajax::success($return);
+	} elseif (init('action') == 'sync') {
+		$params = array('method' => 'getVehicles');
+		myaudi::sendToDaemon($params);
+		ajax::success();
 	}
 
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));

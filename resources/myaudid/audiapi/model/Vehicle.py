@@ -3,10 +3,10 @@ class Vehicle:
     Represents a single vehicle
     """
 
-    def __init__(self):
-        self.vin = ''
-        self.csid = ''
-        self.registered = ''
+    def __init__(self, vin='', csid='', registered=''):
+        self.vin = vin
+        self.csid = csid
+        self.registered = registered
 
     def parse(self, data):
         self.vin = data.get('VIN')

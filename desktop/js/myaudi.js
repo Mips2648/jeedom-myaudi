@@ -82,6 +82,30 @@ $('.pluginAction[data-action=openLocation]').on('click',function(){
     window.open($(this).attr("data-location"), "_blank", null);
 });
 
+$('#bt_syncAudi').on('click', function () {
+    $.ajax({
+        type: "POST",
+        url: "plugins/myaudi/core/ajax/myaudi.ajax.php",
+        data: {
+            action: "sync",
+        },
+        dataType: 'json',
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+        if (data.state != 'ok') {
+            $('#div_alert').showAlert({message: data.result, level: 'danger'});
+            return;
+        }
+        $('#div_alert').showAlert({message: '{{Synchronisation réussie.}}', level: 'success'});
+        setTimeout(function() {
+            window.location.replace("index.php?v=d&m=myaudi&p=myaudi");
+          }, 3000);
+        }
+    });
+});
+
 $(".eqLogicAttr[data-l1key='id']").change(function() {
   $('#img_device').attr("src", 'core/img/no_image.gif');
   if($('.eqLogicAttr[data-l1key=id]').value()!='') {
