@@ -210,6 +210,12 @@ class myaudi extends eqLogic {
 					$celcius = ($value/10)-273.15;
 					$this->checkAndUpdateCmd($key, $celcius);
 					break;
+				case 'MAINTENANCE_INTERVAL_DISTANCE_TO_OIL_CHANGE':
+				case 'MAINTENANCE_INTERVAL_TIME_TO_OIL_CHANGE':
+				case 'MAINTENANCE_INTERVAL_DISTANCE_TO_INSPECTION':
+				case 'MAINTENANCE_INTERVAL_TIME_TO_INSPECTION':
+					$this->checkAndUpdateCmd($key, $value*-1);
+					break;
 				default:
 					$this->checkAndUpdateCmd($key, $value);
 					break;
