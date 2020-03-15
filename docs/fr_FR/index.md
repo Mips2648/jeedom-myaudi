@@ -6,7 +6,7 @@ lang: fr_FR
 
 # Description
 
-Plugin permettant la connexion à la plateforme MyAudi permettant de récupérer les voitures de la marque qui sont compatible.
+Plugin permettant la connexion à la plateforme MyAudi permettant de récupérer les voitures de la marque qui sont compatibles.
 
 # Installation
 
