@@ -6,15 +6,11 @@ lang: fr_FR
 
 # Changelog
 
-[Voir la dernière version](#tocAnchor-1-1-2)
+[Voir la dernière version](#tocAnchor-1-1-1)
 
-## 2020-02-01
+## 2020-03-17
 
 Première version
-
-## 2020-02-14
-
-- Ajout du support des pièces jointes (par exemple les images des caméras)
 
 # Documentation
 
