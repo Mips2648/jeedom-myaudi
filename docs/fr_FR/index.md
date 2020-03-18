@@ -21,9 +21,11 @@ Dans la configuration du plugin il faudra renseigner le nom d'utilisateur et le 
 Dès que le démon démarre, si votre nom d'utilisateur et mot de passe sont correctes, le plugin va créer automatiquement les véhicules liés à votre compte.
 Il est possible de faire une synchronisation manuelle via la page des équipements.
 
+Dans la page de l'équipement vous pouvez configurer la fréquence d'actualisation des données.
+
 # Les commandes
 
-Pour l'instant les commandes suivantes existent:
+Pour l'instant les commandes suivantes sont disponibles:
 
 - Température extérieur
 - Kilométrage

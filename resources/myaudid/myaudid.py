@@ -92,7 +92,7 @@ def getVehicles():
         tmp["registered"] = vehicle.registered
         tmp["data"] = data.get('getVehicleDataResponse')
         jeedomCom.send_change_immediate(tmp)
-
+        time.sleep(1)
         getVehicleData(api, vehicle)
     del vehiclesResponse
     del car_service

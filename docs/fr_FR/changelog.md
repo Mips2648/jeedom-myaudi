@@ -8,9 +8,14 @@ lang: fr_FR
 
 [Voir la dernière version](#tocAnchor-1-1-1)
 
-## 2020-03-17
+## 2020-03-18
 
 Première version
+
+# Evolution future
+
+- Info et commandes de verrouillage
+- Statut des portes et fenêtres
 
 # Documentation
 
