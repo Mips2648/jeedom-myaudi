@@ -27,7 +27,7 @@ try {
 	ajax::init();
 
 	if (init('action') == 'getEqLogicInfo') {
-		$eqLogic = arlo::byId(init('id'));
+		$eqLogic = myaudi::byId(init('id'));
 		if (!is_object($eqLogic)) {
 			throw new Exception(__('Audi eqLogic non trouvé: ', __FILE__) . init('id'));
 		}
