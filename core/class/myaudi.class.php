@@ -131,7 +131,7 @@ class myaudi extends eqLogic {
 		}
 
 		$path = realpath(dirname(__FILE__) . '/../../resources/myaudid');
-		$cmd = 'sudo python3.7 ' . $path . '/myaudid.py';
+		$cmd = 'sudo python3 ' . $path . '/myaudid.py';
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
 		$cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55066');
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/myaudi/core/php/jeeMyAudi.php';
