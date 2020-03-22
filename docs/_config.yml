@@ -18,7 +18,7 @@ plugins:
 - jekyll-seo-tag
 title: "Rocket.chat"
 description: "Ceci est la documentation du plugin Rocket.chat de la solution domotique Jeedom."
-author: "Mips2648"
+author: "Mips"
 image: https://www.jeedom.com/site/logo.png
 forum: https://community.jeedom.com/tags/plugin-myaudi
 tagPlugin: plugin-myaudi

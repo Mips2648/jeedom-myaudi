@@ -3,7 +3,7 @@
 	"name" : "My Audi",
 	"description" : "Plugin permettant la connexion à My Audi connect",
 	"licence" : "AGPL",
-	"author" : "Mips2648",
+	"author" : "Mips",
 	"require" : "3.3.24",
 	"category" : "devicecommunication",
 	"hasDependency" : false,
