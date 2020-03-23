@@ -153,13 +153,10 @@ try:
     jeedom_utils.write_pid(str(_pidfile))
     jeedomSocket = jeedom_socket(port=_socket_port,address=_socket_host)
     jeedomCom = jeedom_com(apikey = _apikey,url = _callback,cycle=_cycle)
-    try:
-        getVehicles()
-    except Exception as e:
-        logging.error('error : '+str(e))
+
+    getVehicles()
 
     listen()
-
 except Exception as e:
     logging.error('Fatal error : '+str(e))
 

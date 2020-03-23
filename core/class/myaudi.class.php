@@ -119,8 +119,18 @@ class myaudi extends eqLogic {
 				shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
 			}
 		}
-		$return['launchable'] = 'ok';
-		return $return;
+        $return['launchable'] = 'ok';
+        $user = config::byKey('user', __CLASS__);
+        $pswd = config::byKey('password', __CLASS__);
+        if ($user=='') {
+            $return['launchable'] = 'nok';
+            $return['launchable_message'] = __('Le nom d\'utilisateur n\'est pas configuré', __FILE__);
+
+        } elseif ($pswd=='') {
+            $return['launchable'] = 'nok';
+            $return['launchable_message'] = __('Le mot de passe n\'est pas configuré', __FILE__);
+        }
+        return $return;
 	}
 
 	public static function deamon_start() {
@@ -186,6 +196,10 @@ class myaudi extends eqLogic {
 	}
 
 	public static function sendToDaemon($params) {
+		$deamon_info = self::deamon_info();
+		if ($deamon_info['state'] != 'ok') {
+			throw new Exception("Le démon n'est pas démarré");
+		}
 		$params['apikey'] = jeedom::getApiKey(__CLASS__);
 		$payLoad = json_encode($params);
 		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
