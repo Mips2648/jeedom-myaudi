@@ -12,6 +12,10 @@ Plugin permettant la connexion à la plateforme MyAudi permettant de récupérer
 
 Afin d’utiliser le plugin, vous devez le télécharger, l’installer et l’activer comme tout plugin Jeedom.
 
+> **Important**
+>
+> Le plugin ne fonctionnera pas sous Jessie, il est nécessaire de pouvoir installer python 3.5 minimum, qui n'est pas disponible sous Jessie.
+
 # Configuration du plugin
 
 Dans la configuration du plugin il faudra renseigner le nom d'utilisateur et le mot de passe.
