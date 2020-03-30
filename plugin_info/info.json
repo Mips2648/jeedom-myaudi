@@ -9,8 +9,8 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : true,
 	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://mips2648.gitlab.io/jeedom-myaudi/#language#/changelog",
-	"documentation" : "https://mips2648.gitlab.io/jeedom-myaudi/#language#/",
+	"changelog" : "https://mips2648.github.io/jeedom-plugins-docs/myaudi/#language#/changelog",
+	"documentation" : "https://mips2648.github.io/jeedom-plugins-docs/myaudi/#language#/",
 	"link" : {
 		"forum":"https://community.jeedom.com/tags/plugin-myaudi",
 		"video" : ""
