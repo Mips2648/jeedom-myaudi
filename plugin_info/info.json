@@ -6,7 +6,7 @@
 	"author" : "Mips",
 	"require" : "3.3.24",
 	"category" : "devicecommunication",
-	"hasDependency" : false,
+	"hasDependency" : true,
 	"hasOwnDeamon" : true,
 	"maxDependancyInstallTime" : 0,
 	"changelog" : "https://mips2648.github.io/jeedom-plugins-docs/myaudi/#language#/changelog",
