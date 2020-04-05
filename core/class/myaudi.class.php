@@ -118,7 +118,7 @@ class myaudi extends eqLogic {
 		if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependency')) {
 			$return['state'] = 'in_progress';
 		} else {
-            if (exec('python3 -c \'import pkgutil; print(1 if pkgutil.find_loader("requests") else 0)\'') == 0) {
+            if (exec(system::getCmdSudo() . system::get('cmd_check') . '-E "python3\-requests" | wc -l') < 1) {
                 $return['state'] = 'nok';
 			} else {
 				$return['state'] = 'ok';
