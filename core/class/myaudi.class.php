@@ -202,7 +202,6 @@ class myaudi extends eqLogic {
 
 	public static function cron() {
 		foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
-			if ($eqLogic->getIsEnable() != 1) continue;
 			$autorefresh = $eqLogic->getConfiguration('autorefresh', '');
 			if ($autorefresh == '')  continue;
 			try {
