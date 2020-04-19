@@ -8,13 +8,7 @@
             "name": "Mips"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/Mips2648/jeedom-tools"
-        }
-    ],
     "require": {
-        "mips/jeedom-tools": "dev-master"
+        "mips/jeedom-tools": "~0.1"
     }
 }

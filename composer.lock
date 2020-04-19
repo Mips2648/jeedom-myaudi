@@ -4,11 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ba3f827e8579d7db9ee32a1617e5d29",
+    "content-hash": "563a04a05d61d6608dfc80132a5321e1",
     "packages": [
         {
             "name": "mips/jeedom-tools",
-            "version": "dev-master",
+            "version": "v0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mips2648/jeedom-tools.git",
@@ -26,6 +26,7 @@
                     "MipsEqLogicTrait": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -35,19 +36,13 @@
                 }
             ],
             "description": "Jeedom tools for plugin dev",
-            "support": {
-                "source": "https://github.com/Mips2648/jeedom-tools/tree/master",
-                "issues": "https://github.com/Mips2648/jeedom-tools/issues"
-            },
             "time": "2020-04-18T14:37:44+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "mips/jeedom-tools": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
