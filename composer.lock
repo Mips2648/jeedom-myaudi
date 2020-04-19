@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "mips/jeedom-tools",
-            "version": "v0.3",
+            "version": "v0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mips2648/jeedom-tools.git",
-                "reference": "c4ac24073ef088c9e2abac23786d067d8a943dd3"
+                "reference": "7c40c4b5cf29f6c627012ea091aa6fe9828734b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/c4ac24073ef088c9e2abac23786d067d8a943dd3",
-                "reference": "c4ac24073ef088c9e2abac23786d067d8a943dd3",
+                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/7c40c4b5cf29f6c627012ea091aa6fe9828734b5",
+                "reference": "7c40c4b5cf29f6c627012ea091aa6fe9828734b5",
                 "shasum": ""
             },
             "type": "library",
@@ -36,7 +36,7 @@
                 }
             ],
             "description": "Jeedom tools for plugin dev",
-            "time": "2020-04-19T16:02:46+00:00"
+            "time": "2020-04-19T17:09:52+00:00"
         }
     ],
     "packages-dev": [],
