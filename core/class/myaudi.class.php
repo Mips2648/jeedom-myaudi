@@ -168,7 +168,7 @@ class myaudi extends eqLogic {
 			file_put_contents($filepath, file_get_contents($vehicle['data']['Vehicle']['LifeData']['MediaData'][0]['URL']));
 		}
 
-		$eqLogic->createCommandsFromConfig(__DIR__ . '/../config/commands.json', 'vehicle');
+		$eqLogic->createCommandsFromConfigFile(__DIR__ . '/../config/commands.json', 'vehicle');
 	}
 
 	public function updateVehicleData($data) {

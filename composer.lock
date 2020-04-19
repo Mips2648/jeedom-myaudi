@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2f2d9f55e5c9dc5b01e7be289c0adbf",
+    "content-hash": "a7dffdf7b4927d8cdcfc9232ccf93c85",
     "packages": [
         {
             "name": "mips/jeedom-tools",
-            "version": "v0.2",
+            "version": "v0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mips2648/jeedom-tools.git",
-                "reference": "8c02770e3c22b96edcdec13f140e7645b660066e"
+                "reference": "c4ac24073ef088c9e2abac23786d067d8a943dd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/8c02770e3c22b96edcdec13f140e7645b660066e",
-                "reference": "8c02770e3c22b96edcdec13f140e7645b660066e",
+                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/c4ac24073ef088c9e2abac23786d067d8a943dd3",
+                "reference": "c4ac24073ef088c9e2abac23786d067d8a943dd3",
                 "shasum": ""
             },
             "type": "library",
@@ -36,7 +36,7 @@
                 }
             ],
             "description": "Jeedom tools for plugin dev",
-            "time": "2020-04-19T15:31:05+00:00"
+            "time": "2020-04-19T16:02:46+00:00"
         }
     ],
     "packages-dev": [],
