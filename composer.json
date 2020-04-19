@@ -2,13 +2,12 @@
     "name": "mips/jeedom-myaudi",
     "description": "MyAudi plugin for jeedom",
     "license": "GPL",
-    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Mips"
         }
     ],
     "require": {
-        "mips/jeedom-tools": "~0.1"
+        "mips/jeedom-tools": "~0.2"
     }
 }
