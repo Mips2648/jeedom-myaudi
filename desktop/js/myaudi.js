@@ -54,21 +54,6 @@ function addCmdToTable(_cmd) {
     tr += '</td>';
     tr += '</tr>';
     $('#table_cmd tbody').append(tr);
-    var tr = $('#table_cmd tbody tr:last');
-    jeedom.user.all({
-      error: function (error) {
-        $('#div_alert').showAlert({message: error.message, level: 'danger'});
-      },
-      success: function (data) {
-        var option = '<option value="">Aucun</option>';
-        for (var i in data) {
-          option += '<option value="' + data[i].id + '">' + data[i].login + '</option>';
-        }
-        tr.find('.cmdAttr[data-l1key=configuration][data-l2key=user]').empty().append(option);
-        tr.setValues(_cmd, '.cmdAttr');
-        modifyWithoutSave = false;
-      }
-    });
     $('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
     if (isset(_cmd.type)) {
         $('#table_cmd tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));

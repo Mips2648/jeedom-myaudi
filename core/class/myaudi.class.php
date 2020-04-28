@@ -172,6 +172,8 @@ class myaudi extends eqLogic {
 	}
 
 	public function updateVehicleData($data) {
+		$vehicleLockState = 1;
+		$vehicleOpenState = 1;
 		foreach ($data as $key => $value) {
 			switch ($key) {
 				case 'TEMPERATURE_OUTSIDE':
@@ -184,12 +186,36 @@ class myaudi extends eqLogic {
 				case 'MAINTENANCE_INTERVAL_TIME_TO_INSPECTION':
 					$this->checkAndUpdateCmd($key, $value*-1);
 					break;
+				case 'LOCK_STATE_LEFT_FRONT_DOOR':
+				case 'LOCK_STATE_LEFT_REAR_DOOR':
+				case 'LOCK_STATE_RIGHT_FRONT_DOOR':
+				case 'LOCK_STATE_RIGHT_REAR_DOOR':
+				case 'LOCK_STATE_TRUNK_LID':
+					log::add(__CLASS__, 'debug', $key.'='.$value);
+					$doorLockState = $value==2 ? 1 : 0;
+					$vehicleLockState &= $doorLockState;
+					$this->checkAndUpdateCmd($key, $doorLockState);
+					break;
+				case 'OPEN_STATE_LEFT_FRONT_DOOR':
+				case 'OPEN_STATE_LEFT_REAR_DOOR':
+				case 'OPEN_STATE_RIGHT_FRONT_DOOR':
+				case 'OPEN_STATE_RIGHT_REAR_DOOR':
+				case 'OPEN_STATE_TRUNK_LID':
+					log::add(__CLASS__, 'debug', $key.'='.$value);
+					$doorOpenState = $value==3 ? 1 : 0;
+					$vehicleOpenState &= $doorOpenState;
+
+					$this->checkAndUpdateCmd($key, $doorOpenState);
+					break;
 				default:
 					$this->checkAndUpdateCmd($key, $value);
 					break;
 			}
-
 		}
+		log::add(__CLASS__, 'debug', "LOCK_STATE_VEHICLE: {$vehicleLockState}");
+		$this->checkAndUpdateCmd('LOCK_STATE_VEHICLE', $vehicleLockState);
+		log::add(__CLASS__, 'debug', "OPEN_STATE_VEHICLE: {$vehicleOpenState}");
+		$this->checkAndUpdateCmd('OPEN_STATE_VEHICLE', $vehicleOpenState);
 	}
 
 	public function preInsert() {
