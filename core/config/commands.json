@@ -181,6 +181,150 @@
                 "dashboard" : "line",
                 "mobile" : "line"
             }
+        },
+        {
+            "logicalId": "LOCK_STATE_LEFT_FRONT_DOOR",
+            "name": "Porte avant gauche verrouillée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "LOCK_STATE_LEFT_REAR_DOOR",
+            "name": "Porte arrière gauche verrouillée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "LOCK_STATE_RIGHT_FRONT_DOOR",
+            "name": "Porte avant droite verrouillée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "LOCK_STATE_RIGHT_REAR_DOOR",
+            "name": "Porte arrière droite verrouillée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "LOCK_STATE_VEHICLE",
+            "name": "Véhicule verrouillé",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OPEN_STATE_LEFT_FRONT_DOOR",
+            "name": "Porte avant gauche fermée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OPEN_STATE_LEFT_REAR_DOOR",
+            "name": "Porte arrière gauche fermée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OPEN_STATE_RIGHT_FRONT_DOOR",
+            "name": "Porte avant droite fermée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OPEN_STATE_RIGHT_REAR_DOOR",
+            "name": "Porte arrière droite fermée",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OPEN_STATE_VEHICLE",
+            "name": "Portes fermées",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "LOCK_STATE_TRUNK_LID",
+            "name": "Hayon verouillé",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
+        },
+        {
+            "logicalId": "OPEN_STATE_TRUNK_LID",
+            "name": "Hayon fermé",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            }
         }
     ]
 }
