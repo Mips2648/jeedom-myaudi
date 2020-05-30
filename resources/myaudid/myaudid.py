@@ -103,10 +103,25 @@ def getVehicleData(api: API.API, vehicle: Services.Vehicle):
     vehicleData = Services.VehicleStatusReportService(api, vehicle).get_stored_vehicle_data()
     tmp = {}
     tmp["vehicleData"] = vehicle.vin
+    tmp["data"] = {}
     for data in vehicleData.data_fields:
-        tmp[data.name] = data.value
+        tmp["data"][data.name] = data.value
+
+    logging.debug('Get vehicle position...')
+    vehiclePosition = Services.CarFinderService(api, vehicle).find()
+    tmp["position"] = vehiclePosition["findCarResponse"]["Position"]
+
     jeedomCom.send_change_immediate(tmp)
+
     del vehicleData
+    del vehiclePosition
+
+    # logging.debug('Get vehicle actions...')
+    # action = Services.LockUnlockService(api, vehicle).get_actions()
+    # tmp = {}
+    # tmp["vehicleAction"] = action
+    # jeedomCom.send_change_immediate(tmp)
+
 
 # ----------------------------------------------------------------------------
 
