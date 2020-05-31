@@ -119,13 +119,6 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     </div>
                                 </div>
                             </div>
-                            <br/>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{Widget}}</label>
-                                <div class="col-sm-9">
-                                    <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="showMaps"/>{{Afficher la carte avec la localisation}}</label>
-                                </div>
-                            </div>
                         </fieldset>
                     </form>
                 </div>

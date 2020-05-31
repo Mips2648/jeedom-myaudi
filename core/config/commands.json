@@ -336,6 +336,14 @@
             "template": {
                 "dashboard" : "line",
                 "mobile" : "line"
+            },
+            "display": {
+                "parameters": {
+                    "showMap": 1,
+                    "mapWidth" : 240,
+                    "mapHeight" : 180,
+                    "showCoordinates": 0
+                }
             }
         }
     ]

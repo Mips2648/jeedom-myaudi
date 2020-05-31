@@ -39,7 +39,7 @@ if (!isConnect()) {
         </div>
         <legend><i class="fas fa-university"></i> {{Options}}</legend>
         <div class="form-group">
-            <label class="col-sm-4 control-label">{{Clé API Google Maps)}}</label>
+            <label class="col-sm-4 control-label">{{Clé API Google Maps}}</label>
             <div class="col-sm-4">
                 <input class="configKey form-control" data-l1key="googleMapsAPIKey" />
             </div>

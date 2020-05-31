@@ -285,6 +285,16 @@ class myaudi extends eqLogic {
 
 class myaudiCmd extends cmd {
 
+	public static $_widgetPossibility = array(
+		'custom' => array(
+			'widget' => false,
+			'visibility' => true,
+			'displayName' => true,
+			'displayIconAndName' => true,
+			'optionalParameters' => true
+		)
+	);
+
 	public function execute($_options = array()) {
 		$eqlogic = $this->getEqLogic();
 		$eqlogic->refresh();
@@ -292,7 +302,29 @@ class myaudiCmd extends cmd {
 
 	private function locationToHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
 		$apiKey = config::byKey('googleMapsAPIKey', 'myaudi');
-		if ($this->getLogicalId()!=='LOCATION' || $apiKey=='' || $this->getEqLogic()->getConfiguration('showMaps', 0) == 0) {
+		$parameters = $this->getDisplay('parameters');
+
+		$hideCoordinates = 'hidden';
+		$showMap = 1;
+		$mapWidth = 240;
+		$mapHeight = 180;
+		if (is_array($parameters)) {
+			if (isset($parameters['showMap'])) {
+				$showMap = trim($parameters['showMap']);
+			}
+			if (isset($parameters['showCoordinates']) && $parameters['showCoordinates'] == 1) {
+				$hideCoordinates = '';
+			}
+			if (isset($parameters['mapWidth']) && is_numeric($parameters['mapWidth'])) {
+				$mapWidth = $parameters['mapWidth'];
+			}
+			if (isset($parameters['mapHeight']) && is_numeric($parameters['mapHeight'])) {
+				$mapHeight = $parameters['mapHeight'];
+			}
+		}
+		log::add('myaudi', 'debug', "hideCoordinates:{$hideCoordinates} - showMap:{$showMap} - mapWidth:{$mapWidth} - mapHeight:{$mapHeight}");
+
+		if ($this->getLogicalId()!=='LOCATION' || $apiKey=='' || $showMap == 0) {
 			return parent::toHtml($_version, $_options, $_cmdColor);
 		}
 
@@ -305,6 +337,7 @@ class myaudiCmd extends cmd {
 		$replace = array(
 			'#id#' => $this->getId(),
 			'#name#' => $this->getName(),
+			'#location#' => $this->execCmd(),
 			'#name_display#' => ($this->getDisplay('icon') != '') ? $this->getDisplay('icon') : $this->getName(),
 			'#history#' => ($this->getIsHistorized() == 1) ? 'history cursor' : '',
 			'#logicalId#' => $this->getLogicalId(),
@@ -314,10 +347,10 @@ class myaudiCmd extends cmd {
 			'#hideCmdName#' => ($this->getDisplay('showNameOn' . $version2, 1) == 0) ? 'display:none;' : '',
 			'#collectDate#' => $this->getCollectDate(),
 			'#valueDate#' => $this->getValueDate(),
-			'#location#' => $this->execCmd(),
 			'#apiKey#' => $apiKey,
-			'#mapsWidth#' => 240,
-			'#mapsHeight#' => 180
+			'#mapsWidth#' => $mapWidth,
+			'#mapsHeight#' => $mapHeight,
+			'#hideCoordinates#' => $hideCoordinates
 		);
 		if ($this->getDisplay('showIconAndName' . $version2, 0) == 1) {
 			$replace['#name_display#'] = $this->getDisplay('icon') . ' ' . $this->getName();
@@ -325,12 +358,6 @@ class myaudiCmd extends cmd {
 
 		$template = getTemplate('core', $version, 'locationCmd', 'myaudi');
 
-		$parameters = $this->getDisplay('parameters');
-		if (is_array($parameters)) {
-			foreach ($parameters as $key => $value) {
-				$replace['#' . $key . '#'] = $value;
-			}
-		}
 		return template_replace($replace, $template);
 	}
 
