@@ -301,16 +301,19 @@ class myaudiCmd extends cmd {
 	}
 
 	private function locationToHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
-		$apiKey = config::byKey('googleMapsAPIKey', 'myaudi');
-		$parameters = $this->getDisplay('parameters');
+		$version2 = jeedom::versionAlias($_version, false);
+		if ($this->getDisplay('showOn' . $version2, 1) == 0) {
+			return '';
+		}
 
 		$hideCoordinates = 'hidden';
 		$showMap = 1;
 		$mapWidth = 240;
 		$mapHeight = 180;
+		$parameters = $this->getDisplay('parameters');
 		if (is_array($parameters)) {
 			if (isset($parameters['showMap'])) {
-				$showMap = trim($parameters['showMap']);
+				$showMap = $parameters['showMap'];
 			}
 			if (isset($parameters['showCoordinates']) && $parameters['showCoordinates'] == 1) {
 				$hideCoordinates = '';
@@ -322,17 +325,21 @@ class myaudiCmd extends cmd {
 				$mapHeight = $parameters['mapHeight'];
 			}
 		}
-		log::add('myaudi', 'debug', "hideCoordinates:{$hideCoordinates} - showMap:{$showMap} - mapWidth:{$mapWidth} - mapHeight:{$mapHeight}");
 
-		if ($this->getLogicalId()!=='LOCATION' || $apiKey=='' || $showMap == 0) {
+		if ($showMap == 0) {
+			log::add('myaudi', 'info', "map not active, default widget used");
 			return parent::toHtml($_version, $_options, $_cmdColor);
 		}
 
-		$version2 = jeedom::versionAlias($_version, false);
-		if ($this->getDisplay('showOn' . $version2, 1) == 0) {
-			return '';
+		$apiKey = config::byKey('googleMapsAPIKey', 'myaudi');
+		if ($apiKey=='') {
+			log::add('myaudi', 'info', "no google Maps API Key configured, default widget used");
+			return parent::toHtml($_version, $_options, $_cmdColor);
 		}
-		$version = jeedom::versionAlias($_version);
+
+		log::add('myaudi', 'debug', "hideCoordinates:{$hideCoordinates} - showMap:{$showMap} - mapWidth:{$mapWidth} - mapHeight:{$mapHeight}");
+
+
 
 		$replace = array(
 			'#id#' => $this->getId(),
@@ -356,6 +363,7 @@ class myaudiCmd extends cmd {
 			$replace['#name_display#'] = $this->getDisplay('icon') . ' ' . $this->getName();
 		}
 
+		$version = jeedom::versionAlias($_version);
 		$template = getTemplate('core', $version, 'locationCmd', 'myaudi');
 
 		return template_replace($replace, $template);
