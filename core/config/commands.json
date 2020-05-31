@@ -325,6 +325,26 @@
                 "dashboard" : "line",
                 "mobile" : "line"
             }
+        },
+        {
+            "logicalId": "LOCATION",
+            "name": "Localisation",
+            "type": "info",
+            "subtype": "string",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "template": {
+                "dashboard" : "line",
+                "mobile" : "line"
+            },
+            "display": {
+                "parameters": {
+                    "showMap": 1,
+                    "mapWidth" : 240,
+                    "mapHeight" : 180,
+                    "showCoordinates": 0
+                }
+            }
         }
     ]
 }

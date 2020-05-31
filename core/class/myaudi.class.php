@@ -37,8 +37,8 @@ class myaudi extends eqLogic {
 		if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependency')) {
 			$return['state'] = 'in_progress';
 		} else {
-            if (exec(system::getCmdSudo() . system::get('cmd_check') . '-E "python3\-requests" | wc -l') < 1) {
-                $return['state'] = 'nok';
+			if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-requests"') < 1) {
+				$return['state'] = 'nok';
 			} else {
 				$return['state'] = 'ok';
 			}
@@ -59,18 +59,18 @@ class myaudi extends eqLogic {
 				shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
 			}
 		}
-        $return['launchable'] = 'ok';
-        $user = config::byKey('user', __CLASS__);
-        $pswd = config::byKey('password', __CLASS__);
-        if ($user=='') {
-            $return['launchable'] = 'nok';
-            $return['launchable_message'] = __('Le nom d\'utilisateur n\'est pas configuré', __FILE__);
+		$return['launchable'] = 'ok';
+		$user = config::byKey('user', __CLASS__);
+		$pswd = config::byKey('password', __CLASS__);
+		if ($user=='') {
+			$return['launchable'] = 'nok';
+			$return['launchable_message'] = __('Le nom d\'utilisateur n\'est pas configuré', __FILE__);
 
-        } elseif ($pswd=='') {
-            $return['launchable'] = 'nok';
-            $return['launchable_message'] = __('Le mot de passe n\'est pas configuré', __FILE__);
-        }
-        return $return;
+		} elseif ($pswd=='') {
+			$return['launchable'] = 'nok';
+			$return['launchable_message'] = __('Le mot de passe n\'est pas configuré', __FILE__);
+		}
+		return $return;
 	}
 
 	public static function deamon_start() {
@@ -171,10 +171,14 @@ class myaudi extends eqLogic {
 		$eqLogic->createCommandsFromConfigFile(__DIR__ . '/../config/commands.json', 'vehicle');
 	}
 
-	public function updateVehicleData($data) {
+	private static function FormatCoordinates($coordinates) {
+		return substr($coordinates, 0, strlen($coordinates)-6).'.'.substr($coordinates, -6);
+	}
+
+	public function updateVehicleData($vehicle) {
 		$vehicleLockState = 1;
 		$vehicleOpenState = 1;
-		foreach ($data as $key => $value) {
+		foreach ($vehicle['data'] as $key => $value) {
 			switch ($key) {
 				case 'TEMPERATURE_OUTSIDE':
 					$celcius = ($value/10)-273.15;
@@ -216,6 +220,10 @@ class myaudi extends eqLogic {
 		$this->checkAndUpdateCmd('LOCK_STATE_VEHICLE', $vehicleLockState);
 		log::add(__CLASS__, 'debug', "OPEN_STATE_VEHICLE: {$vehicleOpenState}");
 		$this->checkAndUpdateCmd('OPEN_STATE_VEHICLE', $vehicleOpenState);
+
+		$latitude = isset($vehicle['position']['carCoordinate']['latitude']) ? self::FormatCoordinates($vehicle['position']['carCoordinate']['latitude']) : '0';
+		$longitude = isset($vehicle['position']['carCoordinate']['longitude']) ? self::FormatCoordinates($vehicle['position']['carCoordinate']['longitude']) : '0';
+		$this->checkAndUpdateCmd('LOCATION', "{$latitude},{$longitude}");
 	}
 
 	public function preInsert() {
@@ -231,7 +239,7 @@ class myaudi extends eqLogic {
 	}
 
 	public function postSave() {
-
+		$this->refreshWidget();
 	}
 
 	public function preUpdate() {
@@ -248,6 +256,12 @@ class myaudi extends eqLogic {
 
 	public function postRemove() {
 
+	}
+
+	public static function postConfig_googleMapsAPIKey($value) {
+		foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
+			$eqLogic->refreshWidget();
+		}
 	}
 
 	public function getImage($returnPluginIcon = true) {
@@ -271,8 +285,86 @@ class myaudi extends eqLogic {
 
 class myaudiCmd extends cmd {
 
+	public static $_widgetPossibility = array(
+		'custom' => array(
+			'widget' => false,
+			'visibility' => true,
+			'displayName' => true,
+			'displayIconAndName' => true,
+			'optionalParameters' => true
+		)
+	);
+
 	public function execute($_options = array()) {
 		$eqlogic = $this->getEqLogic();
 		$eqlogic->refresh();
+	}
+
+	private function locationToHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
+		$apiKey = config::byKey('googleMapsAPIKey', 'myaudi');
+		$parameters = $this->getDisplay('parameters');
+
+		$hideCoordinates = 'hidden';
+		$showMap = 1;
+		$mapWidth = 240;
+		$mapHeight = 180;
+		if (is_array($parameters)) {
+			if (isset($parameters['showMap'])) {
+				$showMap = trim($parameters['showMap']);
+			}
+			if (isset($parameters['showCoordinates']) && $parameters['showCoordinates'] == 1) {
+				$hideCoordinates = '';
+			}
+			if (isset($parameters['mapWidth']) && is_numeric($parameters['mapWidth'])) {
+				$mapWidth = $parameters['mapWidth'];
+			}
+			if (isset($parameters['mapHeight']) && is_numeric($parameters['mapHeight'])) {
+				$mapHeight = $parameters['mapHeight'];
+			}
+		}
+		log::add('myaudi', 'debug', "hideCoordinates:{$hideCoordinates} - showMap:{$showMap} - mapWidth:{$mapWidth} - mapHeight:{$mapHeight}");
+
+		if ($this->getLogicalId()!=='LOCATION' || $apiKey=='' || $showMap == 0) {
+			return parent::toHtml($_version, $_options, $_cmdColor);
+		}
+
+		$version2 = jeedom::versionAlias($_version, false);
+		if ($this->getDisplay('showOn' . $version2, 1) == 0) {
+			return '';
+		}
+		$version = jeedom::versionAlias($_version);
+
+		$replace = array(
+			'#id#' => $this->getId(),
+			'#name#' => $this->getName(),
+			'#location#' => $this->execCmd(),
+			'#name_display#' => ($this->getDisplay('icon') != '') ? $this->getDisplay('icon') : $this->getName(),
+			'#history#' => ($this->getIsHistorized() == 1) ? 'history cursor' : '',
+			'#logicalId#' => $this->getLogicalId(),
+			'#uid#' => 'cmd' . $this->getId() . eqLogic::UIDDELIMITER . mt_rand() . eqLogic::UIDDELIMITER,
+			'#version#' => $_version,
+			'#eqLogic_id#' => $this->getEqLogic_id(),
+			'#hideCmdName#' => ($this->getDisplay('showNameOn' . $version2, 1) == 0) ? 'display:none;' : '',
+			'#collectDate#' => $this->getCollectDate(),
+			'#valueDate#' => $this->getValueDate(),
+			'#apiKey#' => $apiKey,
+			'#mapsWidth#' => $mapWidth,
+			'#mapsHeight#' => $mapHeight,
+			'#hideCoordinates#' => $hideCoordinates
+		);
+		if ($this->getDisplay('showIconAndName' . $version2, 0) == 1) {
+			$replace['#name_display#'] = $this->getDisplay('icon') . ' ' . $this->getName();
+		}
+
+		$template = getTemplate('core', $version, 'locationCmd', 'myaudi');
+
+		return template_replace($replace, $template);
+	}
+
+	public function toHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
+		if ($this->getLogicalId()=='LOCATION') {
+			return $this->locationToHtml($_version, $_options, $_cmdColor);
+		}
+		return parent::toHtml($_version, $_options, $_cmdColor);
 	}
 }

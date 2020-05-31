@@ -48,13 +48,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
     </div>
 </div>
 
-<div class="col-xs-12 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
+<div class="col-xs-12 eqLogic" style="display: none;">
     <div class="input-group pull-right" style="display:inline-flex">
         <span class="input-group-btn">
-            <a class="btn btn-primary btn-sm pluginAction roundedLeft" data-action="openLocation" data-location="<?=$plugin->getDocumentation()?>"><i class="fas fa-book"></i> {{Documentation}}</a>
-            <a class="btn btn-default btn-sm eqLogicAction" data-action="configure"><i class="fas fa-cogs"></i> {{Configuration avancée}}</a>
-            <a class="btn btn-success btn-sm eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a>
-            <a class="btn btn-danger btn-sm eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
+            <a class="btn btn-default btn-sm eqLogicAction roundedLeft" data-action="configure"><i class="fas fa-cogs"></i> {{Configuration avancée}}</a><a class="btn btn-success btn-sm eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a><a class="btn btn-danger btn-sm eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
         </span>
     </div>
     <ul class="nav nav-tabs" role="tablist">
@@ -108,11 +105,12 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible"/>{{Visible}}</label>
                                 </div>
                             </div>
+                            <br/>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Auto-actualisation (cron)}}</label>
                                 <div class="col-sm-3">
                                     <div class="input-group">
-                                        <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="autorefresh" placeholder="{{Auto-actualisation (cron)}}"/>
+                                        <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="autorefresh" placeholder=""/>
                                         <span class="input-group-btn">
                                             <a class="btn btn-default cursor jeeHelper" data-helper="cron">
                                                 <i class="fas fa-question-circle"></i>
