@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 class myaudi extends eqLogic {
 	use MipsEqLogicTrait;
 
-	private static $PICTURES_DIR = __DIR__ . "/../pictures/";
+	private static $PICTURES_DIR = __DIR__ . "/../../data/pictures/";
 
 	public static function dependancy_install() {
 		log::remove(__CLASS__.'_update');
@@ -268,7 +268,7 @@ class myaudi extends eqLogic {
 		$file = "{$this->getLogicalId()}-{$this->getConfiguration('csid')}.png";
 		log::add(__CLASS__, 'debug', "get image {$file}");
 		if (file_exists(myaudi::$PICTURES_DIR.$file)) {
-			return "plugins/myaudi/core/pictures/{$file}";
+			return "plugins/myaudi/data/pictures/{$file}";
 		}
 		log::add(__CLASS__, 'debug', "not found?");
 		if ($returnPluginIcon) {

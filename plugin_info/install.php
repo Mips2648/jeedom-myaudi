@@ -19,16 +19,21 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function myaudi_install() {
-
+    $pluginId = 'myaudi';
+    config::save('api', config::genKey(), $pluginId);
+    config::save("api::{$pluginId}::mode", 'localhost');
 }
 
 function myaudi_update() {
-
+    $pluginId = 'myaudi';
+    config::save('api', config::genKey(), $pluginId);
+    config::save("api::{$pluginId}::mode", 'localhost');
 }
 
-
 function myaudi_remove() {
-
+    $pluginId = 'myaudi';
+    config::remove('api', $pluginId);
+    config::remove("api::{$pluginId}::mode");
 }
 
 ?>
