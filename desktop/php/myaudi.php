@@ -11,22 +11,22 @@ $eqLogics = eqLogic::byType($plugin->getId());
     <div class="col-xs-12 eqLogicThumbnailDisplay">
     <legend><i class="fas fa-cog"></i>  {{Gestion}}</legend>
     <div class="eqLogicThumbnailContainer">
-        <div class="cursor eqLogicAction" data-action="gotoPluginConf">
+        <div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
             <i class="fas fa-wrench"></i>
             <br>
             <span>{{Configuration}}</span>
         </div>
-        <div class="cursor pluginAction" data-action="openLocation" data-location="<?=$plugin->getDocumentation()?>">
+        <div class="cursor pluginAction logoSecondary" data-action="openLocation" data-location="<?=$plugin->getDocumentation()?>">
             <i class="fas fa-book"></i>
             <br>
             <span>{{Documentation}}</span>
         </div>
-        <div class="cursor pluginAction" data-action="openLocation" data-location="https://community.jeedom.com/tags/plugin-<?=$plugin->getId()?>">
+        <div class="cursor pluginAction logoSecondary" data-action="openLocation" data-location="https://community.jeedom.com/tags/plugin-<?=$plugin->getId()?>">
             <i class="fas fa-comments"></i>
             <br>
             <span>Community</span>
         </div>
-        <div class="cursor" id="bt_syncAudi">
+        <div class="cursor logoSecondary" id="bt_syncAudi">
             <i class="fas fa-sync"></i>
             <br>
             <span>{{Synchroniser}}</span>
