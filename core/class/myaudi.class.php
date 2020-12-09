@@ -291,6 +291,14 @@ class myaudi extends eqLogic {
 		$params = array('method' => 'getVehicleData', 'vin' => $this->getLogicalId());
 		myaudi::sendToDaemon($params);
 	}
+
+	public function execute_vehicle_action($state){
+		$params = array(
+			'method' => $state,
+			'vin' => $this->getLogicalId()
+		);
+		myaudi::sendToDaemon($params);
+	}
 }
 
 class myaudiCmd extends cmd {

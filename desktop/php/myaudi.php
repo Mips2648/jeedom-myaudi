@@ -32,7 +32,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
             <span>{{Synchroniser}}</span>
         </div>
     </div>
-    <legend><i class="fas fa-table"></i> {{Mes Rocket.chat}}</legend>
+    <legend><i class="fas fa-table"></i> {{Mes Véhicules}}</legend>
     <input class="form-control" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
     <div class="eqLogicThumbnailContainer">
         <?php
@@ -129,6 +129,53 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 <label class="col-sm-3 control-label">{{Modèle}}</label>
                                 <div class="col-sm-9">
                                     <img src="core/img/no_image.gif" data-original=".png" id="img_device" class="img-responsive" style="max-height : 240px;margin-top: 10px"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{VIN}}</label>
+                                <div class="col-sm-6">
+                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="logicalId"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{CSID}}</label>
+                                <div class="col-sm-6">
+                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="csid"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{Marque}}</label>
+                                <div class="col-sm-6">
+                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="brand"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{Type}}</label>
+                                <div class="col-sm-6">
+                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="type"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{Famille}}</label>
+                                <div class="col-sm-6">
+                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="model_family"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{Modèle}}</label>
+                                <div class="col-sm-6">
+                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="model_full"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{Année}}</label>
+                                <div class="col-sm-6">
+                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="model_year"></span>
                                 </div>
                             </div>
                         </fieldset>
