@@ -1,17 +1,20 @@
+import logging
 import asyncio
 from aiohttp import ClientSession
 
+from jeedom.jeedom import jeedom_com
 from audiconnect.audi_connect_account import AudiConnectAccount, AudiConnectObserver
 
 class AudiAccount(AudiConnectObserver):
     
-    def __init__(self, _username : str, _password : str, _country : str, _spin : str):
+    def __init__(self, _username : str, _password : str, _country : str, _spin : str, jcom : jeedom_com):
         self.username = _username
         self.password = _password
         self.country = _country
         self.spin = _spin
         self.vehicles = set()
         self.loop = asyncio.get_event_loop()
+        self.jeedom_com = jcom
 
     def init_connection(self):
         return self.loop.run_until_complete(self.__async__init_connection())
@@ -89,7 +92,7 @@ class AudiAccount(AudiConnectObserver):
             tmp["chargerState"]["plugState"] = vehicle._vehicle.state["plugState"]
             tmp["chargerState"]["chargingState"] = vehicle._vehicle.state["chargingState"]
                 
-        jeedomCom.send_change_immediate(tmp)
+        self.jeedom_com.send_change_immediate(tmp)
 
     async def __async__init_connection(self):
         self.clientSession = ClientSession()
