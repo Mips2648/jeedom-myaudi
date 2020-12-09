@@ -1,3 +1,8 @@
+import asyncio
+from aiohttp import ClientSession
+
+from audiconnect.audi_connect_account import AudiConnectAccount, AudiConnectObserver
+
 class AudiAccount(AudiConnectObserver):
     
     def __init__(self, _username : str, _password : str, _country : str, _spin : str):

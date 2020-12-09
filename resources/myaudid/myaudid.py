@@ -11,6 +11,8 @@ from jeedom.jeedom import jeedom_utils, jeedom_com, jeedom_socket, JEEDOM_SOCKET
 from audiapi import API, Services
 from audiapi.model.Vehicle import Vehicle
 
+from audiconnect.audi_jeedom_account import AudiAccount
+
 def read_socket():
     global JEEDOM_SOCKET_MESSAGE
     if not JEEDOM_SOCKET_MESSAGE.empty():
@@ -171,7 +173,11 @@ try:
     jeedomSocket = jeedom_socket(port=_socket_port,address=_socket_host)
     jeedomCom = jeedom_com(apikey = _apikey,url = _callback,cycle=_cycle)
 
-    getVehicles()
+    audi = AudiAccount(_user, _pswd, "DE", _spin)
+    audi.init_connection()
+    audi.update()
+
+    #getVehicles()
 
     listen()
 except Exception as e:
