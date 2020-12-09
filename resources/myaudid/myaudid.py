@@ -137,6 +137,7 @@ parser = argparse.ArgumentParser(description='Daemon for Jeedom plugin')
 parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
 parser.add_argument("--user", help="username", type=str)
 parser.add_argument("--pswd", help="password", type=str)
+parser.add_argument("--spin", help="S-PIN", type=str)
 parser.add_argument("--socketport", help="Socket Port", type=int)
 parser.add_argument("--callback", help="Value to write", type=str)
 parser.add_argument("--apikey", help="Value to write", type=str)
@@ -152,6 +153,7 @@ _apikey = args.apikey
 _callback = args.callback
 _user = args.user
 _pswd = args.pswd
+_spin = args.spin
 
 jeedom_utils.set_log_level(_log_level)
 
