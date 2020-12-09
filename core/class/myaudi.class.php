@@ -87,6 +87,7 @@ class myaudi extends eqLogic {
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/myaudi/core/php/jeeMyAudi.php';
 		$cmd .= ' --user "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"';
 		$cmd .= ' --pswd "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"';
+		$cmd .= ' --spin "' . trim(str_replace('"', '\"', config::byKey('spin', __CLASS__))) . '"';
 		$cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
 		$cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/deamon.pid';
 		log::add(__CLASS__, 'info', 'Lancement démon MyAudi');
@@ -154,21 +155,28 @@ class myaudi extends eqLogic {
 			$eqLogic = new self();
 			$eqLogic->setLogicalId($vehicle['vehicle']);
 			$eqLogic->setConfiguration('csid', $vehicle['csid']);
+			$eqLogic->setConfiguration('model_year', $vehicle['model_year']);
+			$eqLogic->setConfiguration('brand', $vehicle['brand']);
+			$eqLogic->setConfiguration('model_family', $vehicle['model_family']);	
+			$eqLogic->setConfiguration('model_full', $vehicle['model_full']);
+			$eqLogic->setConfiguration('type', $vehicle['type']);
 			$eqLogic->setEqType_name(__CLASS__);
 			$eqLogic->setIsEnable(1);
 		}
-		$eqLogic->setName($vehicle['data']['VehicleSpecification']['ModelCoding']['@name']);
+		$eqLogic->setName($vehicle['model_full']);
 		$eqLogic->save();
 
-		if (!file_exists(myaudi::$PICTURES_DIR)) {
-			mkdir(myaudi::$PICTURES_DIR, 0777, true);
-		}
-		$filepath = myaudi::$PICTURES_DIR.$vehicle['vehicle'].'-'.$vehicle['csid'].'.png';
-		if (!file_exists($filepath)) {
-			file_put_contents($filepath, file_get_contents($vehicle['data']['Vehicle']['LifeData']['MediaData'][0]['URL']));
-		}
+		//if (!file_exists(myaudi::$PICTURES_DIR)) {
+			//mkdir(myaudi::$PICTURES_DIR, 0777, true);
+		//}
+		//$filepath = myaudi::$PICTURES_DIR.$vehicle['vehicle'].'-'.$vehicle['csid'].'.png';
+		//if (!file_exists($filepath)) {
+			//file_put_contents($filepath, file_get_contents($vehicle['data']['Vehicle']['LifeData']['MediaData'][0]['URL']));
+		//}
 
 		$eqLogic->createCommandsFromConfigFile(__DIR__ . '/../config/commands.json', 'vehicle');
+
+		$eqLogic->updateVehicleData($vehicle);
 	}
 
 	private static function FormatCoordinates($coordinates) {
@@ -221,8 +229,10 @@ class myaudi extends eqLogic {
 		log::add(__CLASS__, 'debug', "OPEN_STATE_VEHICLE: {$vehicleOpenState}");
 		$this->checkAndUpdateCmd('OPEN_STATE_VEHICLE', $vehicleOpenState);
 
-		$latitude = isset($vehicle['position']['carCoordinate']['latitude']) ? self::FormatCoordinates($vehicle['position']['carCoordinate']['latitude']) : '0';
-		$longitude = isset($vehicle['position']['carCoordinate']['longitude']) ? self::FormatCoordinates($vehicle['position']['carCoordinate']['longitude']) : '0';
+		//$latitude = isset($vehicle['position']['carCoordinate']['latitude']) ? self::FormatCoordinates($vehicle['position']['carCoordinate']['latitude']) : '0';
+		//$longitude = isset($vehicle['position']['carCoordinate']['longitude']) ? self::FormatCoordinates($vehicle['position']['carCoordinate']['longitude']) : '0';
+		$latitude = isset($vehicle['position']['carCoordinate']['latitude']) ? $vehicle['position']['carCoordinate']['latitude'] : '0';
+		$longitude = isset($vehicle['position']['carCoordinate']['longitude']) ? $vehicle['position']['carCoordinate']['longitude'] : '0';
 		$this->checkAndUpdateCmd('LOCATION', "{$latitude},{$longitude}");
 	}
 
@@ -281,6 +291,14 @@ class myaudi extends eqLogic {
 		$params = array('method' => 'getVehicleData', 'vin' => $this->getLogicalId());
 		myaudi::sendToDaemon($params);
 	}
+
+	public function execute_vehicle_action($state){
+		$params = array(
+			'method' => $state,
+			'vin' => $this->getLogicalId()
+		);
+		myaudi::sendToDaemon($params);
+	}
 }
 
 class myaudiCmd extends cmd {
@@ -296,9 +314,62 @@ class myaudiCmd extends cmd {
 	);
 
 	public function execute($_options = array()) {
-		$eqlogic = $this->getEqLogic();
-		$eqlogic->refresh();
-	}
+			
+			$eqlogic = $this->getEqLogic();
+			
+			switch ($this->getLogicalId()) {
+				case 'refresh':
+	            	$eqlogic->refresh();
+	            	break;
+
+	            case 'lock':
+	            	log::add("myaudi", 'debug', "Locking");
+	                $eqlogic->execute_vehicle_action('lock');
+	                break;
+	            case 'unlock':
+	            	log::add("myaudi", 'debug', "Unlocking");
+	                $eqlogic->execute_vehicle_action('unlock');
+	                break;
+
+	            case 'preheater_start':
+	            	log::add("myaudi", 'debug', "Preheater start");
+	                $eqlogic->execute_vehicle_action('start_preheater');
+	                break;
+	            case 'preheater_stop':
+	            	log::add("myaudi", 'debug', "Preheater stop");
+	            	$eqlogic->execute_vehicle_action('stop_preheater');
+	                break;
+
+	            case 'charger_start':
+	            	log::add("myaudi", 'debug', "Charger start");
+	                $eqlogic->execute_vehicle_action('start_charger');
+	                break;
+	            case 'charger_stop':
+	            	log::add("myaudi", 'debug', "Charger stop");
+	                $eqlogic->execute_vehicle_action('stop_charger');
+	                break;
+
+	            case 'ac_start':
+	            	log::add("myaudi", 'debug', "Air conditionning start");
+	                $eqlogic->execute_vehicle_action('start_climatisation');
+	                break;
+	            case 'ac_stop':
+	            	log::add("myaudi", 'debug', "Air conditionning stop");
+	            	$eqlogic->execute_vehicle_action('stop_climatisation');
+	                break;
+
+	            case 'defrost_start':
+	            	log::add("myaudi", 'debug', "Windows defrost start");
+	                $eqlogic->execute_vehicle_action('start_window_heating');
+	                break;
+	            case 'defrost_stop':
+	            	log::add("myaudi", 'debug', "Windows defrost stop");
+	                $eqlogic->execute_vehicle_action('stop_window_heating');
+	                break;
+	            default:
+	            	log::add("myaudi", 'debug', "No action attached to ".$this->getLogicalId());
+	        }	
+		}
 
 	private function locationToHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
 		$version2 = jeedom::versionAlias($_version, false);

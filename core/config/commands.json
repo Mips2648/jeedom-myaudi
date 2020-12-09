@@ -8,6 +8,76 @@
             "isVisible": 1
         },
         {
+            "logicalId": "lock",
+            "name": "Lock",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "unlock",
+            "name": "Unlock",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "preheater_start",
+            "name": "Start Preheater",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "preheater_stop",
+            "name": "Stop Preheater",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "ac_start",
+            "name": "Start Climatisation",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "ac_stop",
+            "name": "Stop Climatisation",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "charger_start",
+            "name": "Start Charger",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "charger_stop",
+            "name": "Stop Charger",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "defrost_start",
+            "name": "Start windows defrost",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "defrost__stop",
+            "name": "Stop windows defrost",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
             "logicalId": "UTC_TIME_AND_KILOMETER_STATUS",
             "name": "Kilométrage",
             "type": "info",
