@@ -8,8 +8,8 @@ import time
 
 from jeedom.jeedom import jeedom_utils, jeedom_com, jeedom_socket, JEEDOM_SOCKET_MESSAGE
 
-from audiapi import API, Services
-from audiapi.model.Vehicle import Vehicle
+#from audiapi import API, Services
+#from audiapi.model.Vehicle import Vehicle
 
 from audiconnect.audi_jeedom_account import AudiAccount
 
