@@ -1,5 +1,5 @@
-PROGRESS_FILE=/tmp/jeedom/influxdb/dependency
-FFMPEG_INSTALL_DIR=/var/www/html/plugins/influxdb/resources/ffmpeg/
+PROGRESS_FILE=/tmp/jeedom/myaudi/dependency
+
 if [ ! -z $1 ]; then
 	PROGRESS_FILE=$1
 fi
