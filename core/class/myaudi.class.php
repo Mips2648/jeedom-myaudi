@@ -39,6 +39,8 @@ class myaudi extends eqLogic {
 		} else {
 			if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-requests|python3\-voluptuous|python3\-bs4"') < 3) {
 				$return['state'] = 'nok';
+			} elseif (exec(system::getCmdSudo() . 'pip3 list | grep -Ewc "aiohttp"') < 1) {
+				$return['state'] = 'nok';
 			} else {
 				$return['state'] = 'ok';
 			}
