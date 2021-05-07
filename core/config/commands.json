@@ -9,70 +9,70 @@
         },
         {
             "logicalId": "lock",
-            "name": "Lock",
+            "name": "Verrouiller",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "unlock",
-            "name": "Unlock",
+            "name": "Déverrouiller",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "preheater_start",
-            "name": "Start Preheater",
+            "name": "Démarrer le préchauffage",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "preheater_stop",
-            "name": "Stop Preheater",
+            "name": "Arrêter le préchauffage",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "ac_start",
-            "name": "Start Climatisation",
+            "name": "Démarrer la climatisation",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "ac_stop",
-            "name": "Stop Climatisation",
+            "name": "Arrêter la climatisation",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "charger_start",
-            "name": "Start Charger",
+            "name": "Démarrer le chargeur",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "charger_stop",
-            "name": "Stop Charger",
+            "name": "Arrêter le chargeur",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "defrost_start",
-            "name": "Start windows defrost",
+            "name": "Démarrer le dégivrage",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "defrost__stop",
-            "name": "Stop windows defrost",
+            "name": "Arrêter le dégivrage",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
@@ -86,8 +86,8 @@
             "isHistorized": 0,
             "unite": "km",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -99,8 +99,8 @@
             "isHistorized": 0,
             "unite": "km",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -112,8 +112,8 @@
             "isHistorized": 0,
             "unite": "jours",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -125,8 +125,8 @@
             "isHistorized": 0,
             "unite": "km",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -138,8 +138,8 @@
             "isHistorized": 0,
             "unite": "jours",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -151,8 +151,8 @@
             "isHistorized": 1,
             "unite": "°C",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -163,8 +163,8 @@
             "isVisible": 1,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -176,8 +176,8 @@
             "isHistorized": 0,
             "unite": "l",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -188,8 +188,8 @@
             "isVisible": 1,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -201,12 +201,12 @@
             "isHistorized": 0,
             "unite": "%",
             "configuration": {
-                "minValue" : 0,
-                "maxValue" : 100
+                "minValue": 0,
+                "maxValue": 100
             },
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -218,8 +218,8 @@
             "isHistorized": 0,
             "unite": "km",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -231,8 +231,8 @@
             "isHistorized": 0,
             "unite": "km",
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -244,12 +244,12 @@
             "isHistorized": 0,
             "unite": "%",
             "configuration": {
-                "minValue" : 0,
-                "maxValue" : 100
+                "minValue": 0,
+                "maxValue": 100
             },
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -260,8 +260,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -272,8 +272,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -284,8 +284,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -296,8 +296,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -308,8 +308,8 @@
             "isVisible": 1,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -320,8 +320,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -332,8 +332,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -344,8 +344,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -356,8 +356,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -368,8 +368,8 @@
             "isVisible": 1,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -380,8 +380,8 @@
             "isVisible": 0,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -392,8 +392,8 @@
             "isVisible": 1,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             }
         },
         {
@@ -404,14 +404,14 @@
             "isVisible": 1,
             "isHistorized": 0,
             "template": {
-                "dashboard" : "line",
-                "mobile" : "line"
+                "dashboard": "line",
+                "mobile": "line"
             },
             "display": {
                 "parameters": {
                     "showMap": 1,
-                    "mapWidth" : 240,
-                    "mapHeight" : 180,
+                    "mapWidth": 240,
+                    "mapHeight": 180,
                     "showCoordinates": 0
                 }
             }

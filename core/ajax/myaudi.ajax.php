@@ -33,7 +33,7 @@ try {
 		}
 
 		$return =  array(
-			"eqLogicImage" => $eqLogic->getImage(true)
+			"eqLogicImage" => $eqLogic->getImage()
 		);
 
 		ajax::success($return);
