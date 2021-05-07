@@ -28,6 +28,13 @@ function myaudi_update() {
     $pluginId = 'myaudi';
     config::save('api', config::genKey(), $pluginId);
     config::save("api::{$pluginId}::mode", 'localhost');
+
+    $dependencyInfo = myaudi::dependancy_info();
+    if (!isset($dependencyInfo['state'])) {
+        message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__));
+    } elseif ($dependencyInfo['state'] == 'nok') {
+        message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__));
+    }
 }
 
 function myaudi_remove() {
@@ -35,5 +42,3 @@ function myaudi_remove() {
     config::remove('api', $pluginId);
     config::remove("api::{$pluginId}::mode");
 }
-
-?>
