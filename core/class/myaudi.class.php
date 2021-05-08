@@ -149,22 +149,22 @@ class myaudi extends eqLogic {
 		socket_close($socket);
 	}
 
-	public static function createVehicle($vehicle) {
+	public static function syncVehicle($vehicle) {
 		$eqLogic = eqLogic::byLogicalId($vehicle['vehicle'], __CLASS__);
 		if (!is_object($eqLogic)) {
 			log::add(__CLASS__, 'info', 'Creating new vehicle with vin="' . $vehicle['vehicle'] . '" and csid="' . $vehicle['csid'] . '"');
 			$eqLogic = new self();
 			$eqLogic->setLogicalId($vehicle['vehicle']);
-			$eqLogic->setConfiguration('csid', $vehicle['csid']);
-			$eqLogic->setConfiguration('model_year', $vehicle['model_year']);
-			$eqLogic->setConfiguration('brand', $vehicle['brand']);
-			$eqLogic->setConfiguration('model_family', $vehicle['model_family']);
-			$eqLogic->setConfiguration('model_full', $vehicle['model_full']);
-			$eqLogic->setConfiguration('type', $vehicle['type']);
+			$eqLogic->setName($vehicle['model_full']);
 			$eqLogic->setEqType_name(__CLASS__);
 			$eqLogic->setIsEnable(1);
 		}
-		$eqLogic->setName($vehicle['model_full']);
+		$eqLogic->setConfiguration('csid', $vehicle['csid']);
+		$eqLogic->setConfiguration('model_year', $vehicle['model_year']);
+		$eqLogic->setConfiguration('brand', $vehicle['brand']);
+		$eqLogic->setConfiguration('model_family', $vehicle['model_family']);
+		$eqLogic->setConfiguration('model_full', $vehicle['model_full']);
+		$eqLogic->setConfiguration('type', $vehicle['type']);
 		$eqLogic->save();
 
 		//if (!file_exists(myaudi::$PICTURES_DIR)) {
