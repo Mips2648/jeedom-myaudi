@@ -6,7 +6,7 @@ from jeedom.jeedom import jeedom_com
 from audiconnect.audi_connect_account import AudiConnectAccount, AudiConnectObserver
 
 class AudiAccount(AudiConnectObserver):
-    
+
     def __init__(self, _username : str, _password : str, _country : str, _spin : str, jcom : jeedom_com):
         self.username = _username
         self.password = _password
@@ -60,7 +60,7 @@ class AudiAccount(AudiConnectObserver):
         if(vehicle.support_climater):
             tmp["support_ac"] = True
             tmp["climatisationState"] = {}
-            tmp["climatisationState"] = vehicle._vehicle.state["climatisationState"]
+            # tmp["climatisationState"] = vehicle._vehicle.state["climatisationState"]
 
 
         if(vehicle.support_position):
@@ -73,7 +73,7 @@ class AudiAccount(AudiConnectObserver):
         if(vehicle.support_preheater):
             tmp["support_preheater"] = True
             tmp["preheaterState"] = {}
-            tmp["preheaterState"] = vehicle._vehicle.state["preheaterState"]
+            # tmp["preheaterState"] = vehicle._vehicle.state["preheaterState"]
 
         if(vehicle.support_charger):
             tmp["support_charger"] = True
@@ -91,7 +91,7 @@ class AudiAccount(AudiConnectObserver):
             tmp["chargerState"]["remainingChargingTime"] = vehicle._vehicle.state["remainingChargingTime"]
             tmp["chargerState"]["plugState"] = vehicle._vehicle.state["plugState"]
             tmp["chargerState"]["chargingState"] = vehicle._vehicle.state["chargingState"]
-                
+
         self.jeedom_com.send_change_immediate(tmp)
 
     async def __async__init_connection(self):
@@ -139,10 +139,9 @@ class AudiAccount(AudiConnectObserver):
             logging.debug("End of Update")
 
         for vehicle in self.connection._vehicles:
-            
             logging.debug("Updating vehicule data for " + vehicle.title + " with vin : " + vehicle.vin)
             self.send_vehicule_to_jeedom(vehicle, False)
-            
+
     async def __async_refresh_vehicle_data(self, vin: str):
         res = await self.connection.refresh_vehicle_data(vin)
 

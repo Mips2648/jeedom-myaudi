@@ -29,11 +29,12 @@ function myaudi_update() {
     config::save('api', config::genKey(), $pluginId);
     config::save("api::{$pluginId}::mode", 'localhost');
 
+    message::removeAll($pluginId, 'checkDependency');
     $dependencyInfo = myaudi::dependancy_info();
     if (!isset($dependencyInfo['state'])) {
-        message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__));
+        message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__), '', 'checkDependency');
     } elseif ($dependencyInfo['state'] == 'nok') {
-        message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__));
+        message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__), '', 'checkDependency');
     }
 }
 

@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 class myaudi extends eqLogic {
 	use MipsEqLogicTrait;
 
-	private static $PICTURES_DIR = __DIR__ . "/../../data/pictures/";
+	// private static $PICTURES_DIR = __DIR__ . "/../../data/pictures/";
 
 	public static function dependancy_install() {
 		log::remove(__CLASS__ . '_update');
