@@ -6,7 +6,9 @@
             "type": "action",
             "subtype": "other",
             "isVisible": 1
-        },
+        }
+    ],
+    "status": [
         {
             "logicalId": "lock",
             "name": "Verrouiller",
@@ -17,62 +19,6 @@
         {
             "logicalId": "unlock",
             "name": "Déverrouiller",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "preheater_start",
-            "name": "Démarrer le préchauffage",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "preheater_stop",
-            "name": "Arrêter le préchauffage",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "ac_start",
-            "name": "Démarrer la climatisation",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "ac_stop",
-            "name": "Arrêter la climatisation",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "charger_start",
-            "name": "Démarrer le chargeur",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "charger_stop",
-            "name": "Arrêter le chargeur",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "defrost_start",
-            "name": "Démarrer le dégivrage",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "defrost__stop",
-            "name": "Arrêter le dégivrage",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
@@ -395,7 +341,41 @@
                 "dashboard": "line",
                 "mobile": "line"
             }
+        }
+    ],
+    "charger": [
+        {
+            "logicalId": "charger_start",
+            "name": "Démarrer le chargeur",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
         },
+        {
+            "logicalId": "charger_stop",
+            "name": "Arrêter le chargeur",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        }
+    ],
+    "climatisation": [
+        {
+            "logicalId": "ac_start",
+            "name": "Démarrer la climatisation",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "ac_stop",
+            "name": "Arrêter la climatisation",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        }
+    ],
+    "position": [
         {
             "logicalId": "LOCATION",
             "name": "Localisation",
@@ -415,6 +395,36 @@
                     "showCoordinates": 0
                 }
             }
+        }
+    ],
+    "preheater": [
+        {
+            "logicalId": "preheater_start",
+            "name": "Démarrer le préchauffage",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "preheater_stop",
+            "name": "Arrêter le préchauffage",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "defrost_start",
+            "name": "Démarrer le dégivrage",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "defrost__stop",
+            "name": "Arrêter le dégivrage",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
         }
     ]
 }

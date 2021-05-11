@@ -174,9 +174,13 @@ class myaudi extends eqLogic {
 		//if (!file_exists($filepath)) {
 		//file_put_contents($filepath, file_get_contents($vehicle['data']['Vehicle']['LifeData']['MediaData'][0]['URL']));
 		//}
-
-		$eqLogic->createCommandsFromConfigFile(__DIR__ . '/../config/commands.json', 'vehicle');
-
+		$commandsConfig = $eqLogic->getCommandsFileContent(__DIR__ . '/../config/commands.json');
+		$eqLogic->createCommandsFromConfig($commandsConfig['vehicle']);
+		if ($vehicle['support_status_report']) $eqLogic->createCommandsFromConfig($commandsConfig['status']);
+		if ($vehicle['support_ac']) $eqLogic->createCommandsFromConfig($commandsConfig['climatisation']);
+		if ($vehicle['support_position']) $eqLogic->createCommandsFromConfig($commandsConfig['position']);
+		if ($vehicle['support_preheater']) $eqLogic->createCommandsFromConfig($commandsConfig['preheater']);
+		if ($vehicle['support_charger']) $eqLogic->createCommandsFromConfig($commandsConfig['charger']);
 		$eqLogic->updateVehicleData($vehicle);
 	}
 
