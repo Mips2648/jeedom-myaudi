@@ -86,12 +86,11 @@ parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
 parser.add_argument("--user", help="username", type=str)
 parser.add_argument("--pswd", help="password", type=str)
 parser.add_argument("--spin", help="S-PIN", type=str)
+parser.add_argument("--country", help="country", type=str)
 parser.add_argument("--socketport", help="Socket Port", type=int)
 parser.add_argument("--callback", help="Value to write", type=str)
 parser.add_argument("--apikey", help="Value to write", type=str)
 parser.add_argument("--pid", help="Value to write", type=str)
-
-parser.add_argument("--cycle", help="Cycle to send event", type=str)
 args = parser.parse_args()
 
 _log_level = args.loglevel
@@ -99,9 +98,6 @@ _socket_port = args.socketport
 _pidfile = args.pid
 _apikey = args.apikey
 _callback = args.callback
-_user = args.user
-_pswd = args.pswd
-_spin = args.spin
 
 jeedom_utils.set_log_level(_log_level)
 
@@ -109,7 +105,7 @@ logging.info('Start daemon')
 logging.info('Log level : '+str(_log_level))
 logging.debug('Socket port : '+str(_socket_port))
 logging.debug('PID file : '+str(_pidfile))
-logging.debug('User : '+str(_user))
+logging.debug('country : '+str(args.country))
 
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGTERM, handler)
@@ -119,7 +115,7 @@ try:
     jeedomSocket = jeedom_socket(port=_socket_port,address=_socket_host)
     jeedomCom = jeedom_com(apikey = _apikey,url = _callback,cycle=_cycle)
 
-    AUDI = AudiAccount(_user, _pswd, "DE", _spin, jeedomCom)
+    AUDI = AudiAccount(args.user, args.pswd, args.country, args.spin, jeedomCom)
     AUDI.init_connection()
     AUDI.update()
 
