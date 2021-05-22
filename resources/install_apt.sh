@@ -1,5 +1,5 @@
-PROGRESS_FILE=/tmp/jeedom/influxdb/dependency
-FFMPEG_INSTALL_DIR=/var/www/html/plugins/influxdb/resources/ffmpeg/
+PROGRESS_FILE=/tmp/jeedom/myaudi/dependency
+
 if [ ! -z $1 ]; then
 	PROGRESS_FILE=$1
 fi
@@ -18,8 +18,14 @@ echo 20 > ${PROGRESS_FILE}
 echo "*****************************"
 echo "Install modules using apt-get"
 echo "*****************************"
-apt-get install -y python3 python3-requests python3-pip
-echo 50 > ${PROGRESS_FILE}
+apt-get install -y python3 python3-requests python3-pip python3-voluptuous python3-bs4
+echo 60 > ${PROGRESS_FILE}
+
+echo "*************************************"
+echo "Install the required python libraries"
+echo "*************************************"
+python3 -m pip install "aiohttp"
+echo 80 > ${PROGRESS_FILE}
 
 echo 100 > ${PROGRESS_FILE}
 echo $(date)

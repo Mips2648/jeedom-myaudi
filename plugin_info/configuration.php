@@ -28,13 +28,38 @@ if (!isConnect()) {
         <div class="form-group">
             <label class="col-sm-4 control-label">{{Nom d'utilisateur}}</label>
             <div class="col-sm-4">
-                <input type="text" class="configKey form-control" data-l1key="user" placeholder="{{Saisir le nom d'utilisateur}}"/>
+                <input type="text" class="configKey form-control" data-l1key="user" placeholder="{{Saisir le nom d'utilisateur}}" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-4 control-label">{{Mot de passe}}</label>
             <div class="col-sm-4">
-                <input type="password"  class="configKey form-control" data-l1key="password" placeholder="{{Saisir le mot de passe}}"/>
+                <input type="password" class="configKey form-control" data-l1key="password" placeholder="{{Saisir le mot de passe}}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{{S-PIN}}</label>
+            <div class="col-sm-4">
+                <input type="password" class="configKey form-control" data-l1key="spin" placeholder="{{Saisir le S-PIN}}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{{Pays}}</label>
+            <div class="col-sm-4">
+                <select class="configKey form-control" data-l1key="country">
+                    <option value="" disabled="">{{Sélectionner votre pays}}</option>
+                    <option value="BE">{{Belgique}}</option>
+                    <option value="DE">{{Allemagne}}</option>
+                    <option value="ES">{{Espagne}}</option>
+                    <option value="FR">{{France}}</option>
+                    <option value="IT">{{Italie}}</option>
+                    <option value="LU">{{Luxembourg}}</option>
+                    <option value="NL">{{Pays-Bas}}</option>
+                    <option value="PT">{{Portugal}}</option>
+                    <option value="CH">{{Suisse}}</option>
+                    <option value="GB">{{Royaume-Uni}}</option>
+                    <option value="AT">{{Autriche}}</option>
+                </select>
             </div>
         </div>
         <legend><i class="fas fa-university"></i> {{Options}}</legend>
@@ -51,5 +76,5 @@ if (!isConnect()) {
                 <input class="configKey form-control" data-l1key="socketport" placeholder="55066" />
             </div>
         </div>
-  </fieldset>
+    </fieldset>
 </form>

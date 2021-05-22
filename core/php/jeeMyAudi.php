@@ -33,7 +33,7 @@ try {
     }
 
     if (isset($result['vehicle'])) {
-        myaudi::createVehicle($result);
+        myaudi::syncVehicle($result);
     } elseif (isset($result['vehicleData'])) {
         $eqLogic = eqLogic::byLogicalId($result['vehicleData'], 'myaudi');
         if (!is_object($eqLogic)) {
@@ -46,7 +46,6 @@ try {
             log::add('myaudi', 'debug', "{$key}:{$value}");
         }
     }
-
 } catch (Exception $e) {
     log::add('myaudi', 'error', displayException($e));
 }
