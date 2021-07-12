@@ -1,9 +1,7 @@
 from .util import log_exception, get_attr, parse_int, parse_float
 from .audi_api import AudiAPI
 from .audi_services import AudiService
-import json
-import time
-from datetime import timedelta, datetime
+from datetime import datetime
 import logging
 import asyncio
 from typing import List
@@ -11,14 +9,12 @@ from typing import List
 from asyncio import TimeoutError
 from aiohttp import ClientResponseError
 
-import voluptuous as vol
 from abc import ABC, abstractmethod
 
 _LOGGER = logging.getLogger(__name__)
 
 MAX_RESPONSE_ATTEMPTS = 10
 REQUEST_STATUS_SLEEP = 5
-
 
 ACTION_LOCK = "lock"
 ACTION_CLIMATISATION = "climatisation"

@@ -18,7 +18,7 @@ echo 20 > ${PROGRESS_FILE}
 echo "*****************************"
 echo "Install modules using apt-get"
 echo "*****************************"
-apt-get install -y python3 python3-requests python3-pip python3-voluptuous python3-bs4
+apt-get install -y python3 python3-requests python3-pip python3-bs4
 echo 60 > ${PROGRESS_FILE}
 
 echo "*************************************"
