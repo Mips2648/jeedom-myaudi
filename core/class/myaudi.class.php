@@ -24,6 +24,7 @@ class myaudi extends eqLogic {
 	use MipsEqLogicTrait;
 
 	// private static $PICTURES_DIR = __DIR__ . "/../../data/pictures/";
+	public static $_encryptConfigKey = array('user', 'password', 'spin', 'googleMapsAPIKey');
 
 	public static function dependancy_install() {
 		log::remove(__CLASS__ . '_update');
