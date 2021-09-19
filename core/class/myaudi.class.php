@@ -96,7 +96,7 @@ class myaudi extends eqLogic {
 		log::add(__CLASS__, 'info', 'Lancement démon MyAudi');
 		$result = exec($cmd . ' >> ' . log::getPathToLog('myaudi_daemon') . ' 2>&1 &');
 		$i = 0;
-		while ($i < 20) {
+		while ($i < 10) {
 			$deamon_info = self::deamon_info();
 			if ($deamon_info['state'] == 'ok') {
 				break;
@@ -104,7 +104,7 @@ class myaudi extends eqLogic {
 			sleep(1);
 			$i++;
 		}
-		if ($i >= 30) {
+		if ($i >= 10) {
 			log::add(__CLASS__, 'error', __('Impossible de lancer le démon MyAudi, vérifiez le log', __FILE__), 'unableStartDeamon');
 			return false;
 		}
