@@ -126,14 +126,20 @@ class myaudi extends eqLogic {
 	public static function cron() {
 		foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
 			$autorefresh = $eqLogic->getConfiguration('autorefresh', '');
+			$cronIsDue = false;
 			if ($autorefresh == '')  continue;
 			try {
 				$cron = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
-				if ($cron->isDue()) {
+				$cronIsDue = $cron->isDue();
+			} catch (Exception $e) {
+				log::add(__CLASS__, 'error', __('Expression cron non valide: ', __FILE__) . $autorefresh);
+			}
+			try {
+				if ($cronIsDue) {
 					$eqLogic->refresh();
 				}
-			} catch (Exception $e) {
-				log::add(__CLASS__, 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
+			} catch (\Throwable $th) {
+				log::add(__CLASS__, 'debug', $th->getMessage());
 			}
 		}
 	}
