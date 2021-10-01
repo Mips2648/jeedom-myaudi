@@ -85,11 +85,9 @@ def shutdown():
 
 _log_level = "error"
 _socket_port = 55066
-_socket_host = 'localhost'
 _pidfile = '/tmp/myaudid.pid'
 _apikey = ''
 _callback = ''
-_cycle = 30
 
 parser = argparse.ArgumentParser(description='Daemon for Jeedom plugin')
 parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
@@ -122,8 +120,8 @@ signal.signal(signal.SIGTERM, handler)
 
 try:
     jeedom_utils.write_pid(str(_pidfile))
-    jeedomSocket = jeedom_socket(port=_socket_port, address=_socket_host)
-    jeedomCom = jeedom_com(apikey=_apikey, url=_callback, cycle=_cycle)
+    jeedomSocket = jeedom_socket(port=_socket_port)
+    jeedomCom = jeedom_com(apikey=_apikey, url=_callback)
 
     AUDI = AudiAccount(args.user, args.pswd, args.country, args.spin, jeedomCom)
     AUDI.init_connection()
