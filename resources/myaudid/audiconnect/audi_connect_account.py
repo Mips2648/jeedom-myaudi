@@ -1,6 +1,7 @@
-import json
-import time
-from datetime import timedelta, datetime
+from .util import log_exception, get_attr, parse_int, parse_float
+from .audi_api import AudiAPI
+from .audi_services import AudiService
+from datetime import datetime
 import logging
 import asyncio
 from typing import List
@@ -8,17 +9,12 @@ from typing import List
 from asyncio import TimeoutError
 from aiohttp import ClientResponseError
 
-import voluptuous as vol
 from abc import ABC, abstractmethod
 
 _LOGGER = logging.getLogger(__name__)
 
 MAX_RESPONSE_ATTEMPTS = 10
 REQUEST_STATUS_SLEEP = 5
-
-from .audi_services import AudiService
-from .audi_api import AudiAPI
-from .util import log_exception, get_attr, parse_int, parse_float
 
 ACTION_LOCK = "lock"
 ACTION_CLIMATISATION = "climatisation"
@@ -68,18 +64,16 @@ class AudiConnectAccount:
         for i in range(self._connect_retries):
             self._loggedin = await self.try_login(i == self._connect_retries - 1)
             if self._loggedin is True:
+                _LOGGER.debug("Logged in")
                 break
 
             if i < self._connect_retries - 1:
-                _LOGGER.error(
-                    "Login to Audi service failed, trying again in {} seconds".format(
-                        self._connect_delay
-                    )
-                )
+                _LOGGER.error("Login to Audi service failed, trying again in {} seconds".format(self._connect_delay))
                 await asyncio.sleep(self._connect_delay)
 
     async def try_login(self, logError):
         try:
+            _LOGGER.debug("Try login")
             await self._audi_service.login(self._username, self._password, False)
             return True
         except Exception as exception:
@@ -133,6 +127,7 @@ class AudiConnectAccount:
                     pass
 
     async def login_and_get_vehicle(self, vin: str):
+        _LOGGER.debug("Login and get vehicle {vin}".format(vin=vin))
         if not self._loggedin:
             await self.login()
 
@@ -151,23 +146,21 @@ class AudiConnectAccount:
             return False
 
         try:
-            _LOGGER.debug(
-                "Sending command to refresh data to vehicle {vin}".format(vin=vin)
-            )
+            _LOGGER.debug("Sending command to refresh data to vehicle {vin}".format(vin=vin))
 
             await self._audi_service.refresh_vehicle_data(vin)
 
-            _LOGGER.debug(
-                "Successfully refreshed data of vehicle {vin}".format(vin=vin)
-            )
+            _LOGGER.debug("Successfully refreshed data of vehicle {vin}".format(vin=vin))
 
             return True
+        except ClientResponseError as resp_exception:
+            log_exception(resp_exception, "Unable to refresh vehicle data of {}".format(vin))
+            if resp_exception.status == 401:
+                _LOGGER.debug("http 401 received, logout")
+                self._loggedin = False
+            return False
         except Exception as exception:
-            log_exception(
-                exception,
-                "Unable to refresh vehicle data of {}".format(vin),
-            )
-
+            log_exception(exception, "Unable to refresh vehicle data of {}".format(vin))
             return False
 
     async def set_vehicle_lock(self, vin: str, lock: bool):
@@ -346,39 +339,39 @@ class AudiConnectVehicle:
         self.support_preheater = True
         self.support_charger = True
 
-    @property
+    @ property
     def vin(self):
         return self._vin
 
-    @property
+    @ property
     def csid(self):
         return self._vehicle.csid
 
-    @property
+    @ property
     def title(self):
         return self._vehicle.title
 
-    @property
+    @ property
     def model(self):
         return self._vehicle.model
 
-    @property
+    @ property
     def model_year(self):
         return self._vehicle.model_year
 
-    @property
+    @ property
     def model_family(self):
         return self._vehicle.model_family
 
-    @property
+    @ property
     def model_full(self):
         return self._vehicle.model_full
 
-    @property
+    @ property
     def brand(self):
         return self._vehicle.brand
 
-    @property
+    @ property
     def type(self):
         return self._vehicle.type
 

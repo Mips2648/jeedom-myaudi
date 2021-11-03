@@ -24,6 +24,7 @@ class myaudi extends eqLogic {
 	use MipsEqLogicTrait;
 
 	// private static $PICTURES_DIR = __DIR__ . "/../../data/pictures/";
+	public static $_encryptConfigKey = array('user', 'password', 'spin', 'googleMapsAPIKey');
 
 	public static function dependancy_install() {
 		log::remove(__CLASS__ . '_update');
@@ -37,7 +38,7 @@ class myaudi extends eqLogic {
 		if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependency')) {
 			$return['state'] = 'in_progress';
 		} else {
-			if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-requests|python3\-voluptuous|python3\-bs4"') < 3) {
+			if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-requests|python3\-bs4"') < 2) {
 				$return['state'] = 'nok';
 			} elseif (exec(system::getCmdSudo() . 'pip3 list | grep -Ewc "aiohttp"') < 1) {
 				$return['state'] = 'nok';
@@ -95,7 +96,7 @@ class myaudi extends eqLogic {
 		log::add(__CLASS__, 'info', 'Lancement démon MyAudi');
 		$result = exec($cmd . ' >> ' . log::getPathToLog('myaudi_daemon') . ' 2>&1 &');
 		$i = 0;
-		while ($i < 20) {
+		while ($i < 10) {
 			$deamon_info = self::deamon_info();
 			if ($deamon_info['state'] == 'ok') {
 				break;
@@ -103,7 +104,7 @@ class myaudi extends eqLogic {
 			sleep(1);
 			$i++;
 		}
-		if ($i >= 30) {
+		if ($i >= 10) {
 			log::add(__CLASS__, 'error', __('Impossible de lancer le démon MyAudi, vérifiez le log', __FILE__), 'unableStartDeamon');
 			return false;
 		}
@@ -125,14 +126,20 @@ class myaudi extends eqLogic {
 	public static function cron() {
 		foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
 			$autorefresh = $eqLogic->getConfiguration('autorefresh', '');
+			$cronIsDue = false;
 			if ($autorefresh == '')  continue;
 			try {
 				$cron = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
-				if ($cron->isDue()) {
+				$cronIsDue = $cron->isDue();
+			} catch (Exception $e) {
+				log::add(__CLASS__, 'error', __('Expression cron non valide: ', __FILE__) . $autorefresh);
+			}
+			try {
+				if ($cronIsDue) {
 					$eqLogic->refresh();
 				}
-			} catch (Exception $e) {
-				log::add(__CLASS__, 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
+			} catch (\Throwable $th) {
+				log::add(__CLASS__, 'debug', $th->getMessage());
 			}
 		}
 	}

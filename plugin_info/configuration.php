@@ -71,7 +71,7 @@ if (!isConnect()) {
         </div>
         <legend><i class="fas fa-university"></i> {{Démon}}</legend>
         <div class="form-group">
-            <label class="col-sm-4 control-label">{{Port socket interne (modification dangereuse)}}</label>
+            <label class="col-sm-4 control-label">{{Port socket interne}}</label>
             <div class="col-sm-1">
                 <input class="configKey form-control" data-l1key="socketport" placeholder="55066" />
             </div>

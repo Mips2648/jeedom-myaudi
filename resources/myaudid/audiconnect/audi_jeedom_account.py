@@ -5,9 +5,10 @@ from aiohttp import ClientSession
 from jeedom.jeedom import jeedom_com
 from audiconnect.audi_connect_account import AudiConnectAccount, AudiConnectObserver
 
+
 class AudiAccount(AudiConnectObserver):
 
-    def __init__(self, _username : str, _password : str, _country : str, _spin : str, jcom : jeedom_com):
+    def __init__(self, _username: str, _password: str, _country: str, _spin: str, jcom: jeedom_com):
         self.username = _username
         self.password = _password
         self.country = _country
@@ -15,6 +16,7 @@ class AudiAccount(AudiConnectObserver):
         self.vehicles = set()
         self.loop = asyncio.get_event_loop()
         self.jeedom_com = jcom
+        self.__retries = 2
 
     def init_connection(self):
         return self.loop.run_until_complete(self.__async__init_connection())
@@ -61,7 +63,6 @@ class AudiAccount(AudiConnectObserver):
             tmp["support_ac"] = True
             tmp["climatisationState"] = {}
             # tmp["climatisationState"] = vehicle._vehicle.state["climatisationState"]
-
 
         if(vehicle.support_position):
             tmp["support_position"] = True
@@ -143,13 +144,13 @@ class AudiAccount(AudiConnectObserver):
             self.send_vehicule_to_jeedom(vehicle, False)
 
     async def __async_refresh_vehicle_data(self, vin: str):
-        res = await self.connection.refresh_vehicle_data(vin)
+        for i in range(self.__retries):
+            res = await self.connection.refresh_vehicle_data(vin)
 
-        if res == True:
-            await self.connection.update(vin)
-            logging.debug("Refresh Vehicule Data Success")
-            for vehicle in self.connection._vehicles:
-                self.send_vehicule_to_jeedom(vehicle, True)
-
-        else:
-            logging.debug("Refresh Vehicule Data Failure")
+            if res == True:
+                await self.connection.update(vin)
+                for vehicle in self.connection._vehicles:
+                    self.send_vehicule_to_jeedom(vehicle, True)
+                break
+            if i < self.__retries - 1:
+                await asyncio.sleep(30)

@@ -10,6 +10,7 @@ from jeedom.jeedom import jeedom_utils, jeedom_com, jeedom_socket, JEEDOM_SOCKET
 
 from audiconnect.audi_jeedom_account import AudiAccount
 
+
 def read_socket():
     global JEEDOM_SOCKET_MESSAGE
     if not JEEDOM_SOCKET_MESSAGE.empty():
@@ -21,24 +22,30 @@ def read_socket():
         try:
             if message['method'] == 'getVehicles':
                 try:
+                    AUDI.init_connection()
                     AUDI.update()
                 except Exception as e:
                     logging.error('getVehicles error : '+str(e))
             elif message['method'] == 'getVehicleData':
                 try:
+                    AUDI.init_connection()
+                    AUDI.update()
                     AUDI.refresh_vehicle_data(message['vin'])
                 except Exception as e:
                     logging.error('getVehicleData error : '+str(e))
             elif message['method'] == 'lock' or message['method'] == 'unlock' or message['method'] == 'start_climatisation' or message['method'] == 'stop_climatisation' or message['method'] == 'stop_charger' or message['method'] == 'start_charger' or message['method'] == 'start_preheater' or message['method'] == 'stop_preheater' or message['method'] == 'start_window_heating' or message['method'] == 'stop_window_heating':
                 try:
+                    AUDI.init_connection()
+                    AUDI.update()
                     AUDI.execute_vehicle_action(message['vin'], message['method'])
                 except Exception as e:
-                    logging.error( message['method'] + ' error : ' + str(e))
+                    logging.error(message['method'] + ' error : ' + str(e))
 
             else:
                 logging.error("unknown method:" + str(message['method']))
         except Exception as e:
             logging.error('Send command to demon error : '+str(e))
+
 
 def listen():
     logging.debug("Start listening")
@@ -52,9 +59,11 @@ def listen():
 
 # ----------------------------------------------------------------------------
 
+
 def handler(signum=None, frame=None):
     logging.debug("Signal %i caught, exiting..." % int(signum))
     shutdown()
+
 
 def shutdown():
     logging.debug("Shutdown")
@@ -73,13 +82,12 @@ def shutdown():
 
 # ----------------------------------------------------------------------------
 
+
 _log_level = "error"
 _socket_port = 55066
-_socket_host = 'localhost'
 _pidfile = '/tmp/myaudid.pid'
 _apikey = ''
 _callback = ''
-_cycle = 30
 
 parser = argparse.ArgumentParser(description='Daemon for Jeedom plugin')
 parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
@@ -112,8 +120,8 @@ signal.signal(signal.SIGTERM, handler)
 
 try:
     jeedom_utils.write_pid(str(_pidfile))
-    jeedomSocket = jeedom_socket(port=_socket_port,address=_socket_host)
-    jeedomCom = jeedom_com(apikey = _apikey,url = _callback,cycle=_cycle)
+    jeedomSocket = jeedom_socket(port=_socket_port)
+    jeedomCom = jeedom_com(apikey=_apikey, url=_callback)
 
     AUDI = AudiAccount(args.user, args.pswd, args.country, args.spin, jeedomCom)
     AUDI.init_connection()
