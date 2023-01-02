@@ -1,21 +1,31 @@
 {
-	"id" : "myaudi",
-	"name" : "My Audi",
-	"description" : "Plugin permettant la connexion à My Audi connect",
-	"utilization" : "",
-	"licence" : "AGPL",
-	"author" : "Mips",
-	"require" : "3.3.24",
-	"category" : "devicecommunication",
-	"hasDependency" : true,
-	"hasOwnDeamon" : true,
-	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://mips2648.github.io/jeedom-plugins-docs/myaudi/#language#/changelog",
-	"documentation" : "https://mips2648.github.io/jeedom-plugins-docs/myaudi/#language#/",
-	"link" : {
-		"forum":"https://community.jeedom.com/tags/plugin-myaudi",
-		"video" : ""
+	"id": "myaudi",
+	"name": "My Audi",
+	"description": "Plugin permettant la connexion à My Audi connect",
+	"utilization": "",
+	"licence": "AGPL",
+	"author": "Mips",
+	"require": "4.3",
+	"category": "devicecommunication",
+	"hasDependency": true,
+	"hasOwnDeamon": true,
+	"maxDependancyInstallTime": 0,
+	"changelog": "https://mips2648.github.io/jeedom-plugins-docs/myaudi/#language#/changelog",
+	"documentation": "https://mips2648.github.io/jeedom-plugins-docs/myaudi/#language#/",
+	"link": {
+		"forum": "https://community.jeedom.com/tags/plugin-myaudi",
+		"video": ""
 	},
-	"language" : ["fr_FR", "en_US"],
-	"compatibility" : ["miniplus","smart","rpi","docker","diy","v4"]
+	"language": [
+		"fr_FR",
+		"en_US"
+	],
+	"compatibility": [
+		"smart",
+		"atlas",
+		"rpi",
+		"docker",
+		"diy",
+		"v4"
+	]
 }
