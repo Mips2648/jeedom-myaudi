@@ -1,36 +1,45 @@
-[
-    {
-        "name": "mips/jeedom-tools",
-        "version": "v0.6",
-        "version_normalized": "0.6.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Mips2648/jeedom-tools.git",
-            "reference": "7c40c4b5cf29f6c627012ea091aa6fe9828734b5"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/7c40c4b5cf29f6c627012ea091aa6fe9828734b5",
-            "reference": "7c40c4b5cf29f6c627012ea091aa6fe9828734b5",
-            "shasum": ""
-        },
-        "time": "2020-04-19T17:09:52+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "MipsEqLogicTrait": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Mips"
-            }
-        ],
-        "description": "Jeedom tools for plugin dev"
-    }
-]
+{
+    "packages": [
+        {
+            "name": "mips/jeedom-tools",
+            "version": "v0.18",
+            "version_normalized": "0.18.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Mips2648/jeedom-tools.git",
+                "reference": "e4b72769e625f82644a8f9626f9dabc1f2dc21f9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/e4b72769e625f82644a8f9626f9dabc1f2dc21f9",
+                "reference": "e4b72769e625f82644a8f9626f9dabc1f2dc21f9",
+                "shasum": ""
+            },
+            "time": "2022-05-19T16:01:15+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "MipsEqLogicTrait": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mips"
+                }
+            ],
+            "description": "Jeedom tools for plugin dev",
+            "support": {
+                "issues": "https://github.com/Mips2648/jeedom-tools/issues",
+                "source": "https://github.com/Mips2648/jeedom-tools/tree/v0.18"
+            },
+            "install-path": "../mips/jeedom-tools"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
