@@ -140,7 +140,7 @@ class myaudi extends eqLogic {
 			log::add(__CLASS__, 'info', 'Creating new vehicle with vin="' . $vehicle['vehicle'] . '" and csid="' . $vehicle['csid'] . '"');
 			$eqLogic = new self();
 			$eqLogic->setLogicalId($vehicle['vehicle']);
-			$eqLogic->setName($vehicle['title']);
+			$eqLogic->setName($vehicle['title'] . '_' . $vehicle['vehicle']);
 			$eqLogic->setEqType_name(__CLASS__);
 			$eqLogic->setIsEnable(1);
 		}
