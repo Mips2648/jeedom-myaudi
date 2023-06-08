@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '5acfb680429118003e68691b5a4013bc93821c47',
+    'reference' => '4a73922e185478d0fbcbe8bf9cb697ea0c4ff8bc',
     'name' => 'mips/jeedom-myaudi',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '5acfb680429118003e68691b5a4013bc93821c47',
+      'reference' => '4a73922e185478d0fbcbe8bf9cb697ea0c4ff8bc',
     ),
     'mips/jeedom-tools' => 
     array (
