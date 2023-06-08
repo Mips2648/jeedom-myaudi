@@ -1,5 +1,3 @@
-import logging
-
 class VehicleData:
     def __init__(self, config_entry):
         self.sensors = set()
@@ -36,6 +34,45 @@ class VehicleDataResponse:
                 continue
             for raw_field in raw_fields:
                 self.data_fields.append(Field(raw_field))
+
+
+class TripDataResponse:
+    def __init__(self, data):
+        self.data_fields = []
+
+        self.tripID = data["tripID"]
+
+        self.averageElectricEngineConsumption = None
+        if "averageElectricEngineConsumption" in data:
+             self.averageElectricEngineConsumption = float(data["averageElectricEngineConsumption"]) / 10
+
+        self.averageFuelConsumption = None
+        if "averageFuelConsumption" in data:
+            self.averageFuelConsumption = float(data["averageFuelConsumption"]) / 10
+
+        self.averageSpeed = None
+        if "averageSpeed" in data:
+            self.averageSpeed = int(data["averageSpeed"])
+
+        self.mileage = None
+        if "mileage" in data:
+            self.mileage = int(data["mileage"])
+
+        self.startMileage = None
+        if "startMileage" in data:
+            self.startMileage = int(data["startMileage"])
+
+        self.traveltime = None
+        if "traveltime" in data:
+            self.traveltime = int(data["traveltime"])
+
+        self.timestamp = None
+        if "timestamp" in data:
+            self.timestamp = data["timestamp"]
+
+        self.overallMileage = None
+        if "overallMileage" in data:
+            self.overallMileage = int(data["overallMileage"])
 
 
 class Field:
@@ -122,21 +159,19 @@ class Vehicle:
         self.model = ""
         self.model_year = ""
         self.model_family = ""
-        self.model_full = ""
-        self.brand = ""
         self.title = ""
-        self.type = ""
 
     def parse(self, data):
         self.vin = data.get("vin")
         self.csid = data.get("csid")
-        self.model = data.get("model")
-        self.model_year = data.get("model_year")
-        self.model_family = data.get("model_family")
-        self.model_full = data.get("model_full")
-        self.brand = data.get("brand")
-        self.title = data.get("title")
-        self.type = data.get("type")
+        if data.get("vehicle") is not None and data.get("vehicle").get("media") is not None:
+            self.model = data.get("vehicle").get("media").get("longName")
+        if data.get("vehicle") is not None and data.get("vehicle").get("core") is not None:
+            self.model_year = data.get("vehicle").get("core").get("modelYear")
+        if data.get("nickname") is not None and len(data.get("nickname")) > 0:
+            self.title = data.get("nickname")
+        elif data.get("vehicle") is not None and data.get("vehicle").get("media") is not None:
+            self.title = data.get("vehicle").get("media").get("shortName")
 
     def __str__(self):
         return str(self.__dict__)
@@ -148,8 +183,7 @@ class VehiclesResponse:
         self.blacklisted_vins = 0
 
     def parse(self, data):
-        logging.debug(data)
-        for item in data.get("vehicles"):
+        for item in data.get("userVehicles"):
             vehicle = Vehicle()
             vehicle.parse(item)
             self.vehicles.append(vehicle)

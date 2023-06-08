@@ -26,29 +26,6 @@ class myaudi extends eqLogic {
 	// private static $PICTURES_DIR = __DIR__ . "/../../data/pictures/";
 	public static $_encryptConfigKey = array('user', 'password', 'spin', 'googleMapsAPIKey');
 
-	public static function dependancy_install() {
-		log::remove(__CLASS__ . '_update');
-		return array('script' => dirname(__FILE__) . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependency', 'log' => log::getPathToLog(__CLASS__ . '_update'));
-	}
-
-	public static function dependancy_info() {
-		$return = array();
-		$return['log'] = log::getPathToLog(__CLASS__ . '_update');
-		$return['progress_file'] = jeedom::getTmpFolder(__CLASS__) . '/dependency';
-		if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependency')) {
-			$return['state'] = 'in_progress';
-		} else {
-			if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-requests|python3\-bs4"') < 2) {
-				$return['state'] = 'nok';
-			} elseif (exec(system::getCmdSudo() . 'pip3 list | grep -Ewc "aiohttp"') < 1) {
-				$return['state'] = 'nok';
-			} else {
-				$return['state'] = 'ok';
-			}
-		}
-		return $return;
-	}
-
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = __CLASS__;
@@ -163,16 +140,14 @@ class myaudi extends eqLogic {
 			log::add(__CLASS__, 'info', 'Creating new vehicle with vin="' . $vehicle['vehicle'] . '" and csid="' . $vehicle['csid'] . '"');
 			$eqLogic = new self();
 			$eqLogic->setLogicalId($vehicle['vehicle']);
-			$eqLogic->setName($vehicle['model_full']);
+			$eqLogic->setName($vehicle['title'] . '_' . $vehicle['vehicle']);
 			$eqLogic->setEqType_name(__CLASS__);
 			$eqLogic->setIsEnable(1);
 		}
 		$eqLogic->setConfiguration('csid', $vehicle['csid']);
 		$eqLogic->setConfiguration('model_year', $vehicle['model_year']);
-		$eqLogic->setConfiguration('brand', $vehicle['brand']);
 		$eqLogic->setConfiguration('model_family', $vehicle['model_family']);
-		$eqLogic->setConfiguration('model_full', $vehicle['model_full']);
-		$eqLogic->setConfiguration('type', $vehicle['type']);
+		$eqLogic->setConfiguration('model', $vehicle['model']);
 		$eqLogic->save();
 
 		//if (!file_exists(myaudi::$PICTURES_DIR)) {

@@ -4,10 +4,13 @@ import uuid
 import base64
 import os
 import math
+import re
 import logging
 from time import strftime, gmtime
+from datetime import timedelta, datetime
 
 from .audi_models import (
+    TripDataResponse,
     CurrentVehicleDataResponse,
     VehicleDataResponse,
     VehiclesResponse,
@@ -17,9 +20,10 @@ from .audi_api import AudiAPI
 from .util import to_byte_array, get_attr
 
 from hashlib import sha256, sha512
+import hmac
 import asyncio
 
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, urlencode
 
 import requests
 from bs4 import BeautifulSoup
@@ -36,8 +40,7 @@ FAILED = "failed"
 REQUEST_SUCCESSFUL = "request_successful"
 REQUEST_FAILED = "request_failed"
 
-CLIENT_ID = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com"
-XCLIENT_ID = "77869e21-e30a-4a92-b016-48ab7d3db1d8"
+_LOGGER = logging.getLogger(__name__)
 
 
 class BrowserLoginResponse:
@@ -71,11 +74,50 @@ class AudiService:
     def __init__(self, api: AudiAPI, country: str, spin: str):
         self._api = api
         self._country = country
+        self._language = None
         self._type = "Audi"
         self._spin = spin
+        self._homeRegion = {}
+        self._homeRegionSetter = {}
+        self.mbbOAuthBaseURL = None
+        self.mbboauthToken = None
+        self.xclientId = None
+        self._tokenEndpoint = ""
+        self._bearer_token_json = None
+        self._client_id = ""
+        self._authorizationServerBaseURLLive = ""
 
         if self._country is None:
             self._country = "DE"
+
+    def get_hidden_html_input_form_data(self, response, form_data: Dict[str, str]):
+        # Now parse the html body and extract the target url, csrf token and other required parameters
+        html = BeautifulSoup(response, "html.parser")
+        form_tag = html.find("form")
+
+        form_inputs = html.find_all("input", attrs={"type": "hidden"})
+        for form_input in form_inputs:
+            name = form_input.get("name")
+            form_data[name] = form_input.get("value")
+
+        return form_data
+
+    def get_post_url(self, response, url):
+        # Now parse the html body and extract the target url, csrf token and other required parameters
+        html = BeautifulSoup(response, "html.parser")
+        form_tag = html.find("form")
+
+        # Extract the target url
+        action = form_tag.get("action")
+        if action.startswith("http"):
+            # Absolute url
+            username_post_url = action
+        elif action.startswith("/"):
+            # Relative to domain
+            username_post_url = BrowserLoginResponse.to_absolute(url, action)
+        else:
+            raise RequestException("Unknown form action: " + action)
+        return username_post_url
 
     async def login(self, user: str, password: str, persist_token: bool = True):
         await self.login_request(user, password)
@@ -84,7 +126,8 @@ class AudiService:
         res = await self.request_current_vehicle_data(vin.upper())
         request_id = res.request_id
 
-        checkUrl = "https://msg.volkswagen.de/fs-car/bs/vsr/v1/{type}/{country}/vehicles/{vin}/requests/{requestId}/jobstatus".format(
+        checkUrl = "{homeRegion}/fs-car/bs/vsr/v1/{type}/{country}/vehicles/{vin}/requests/{requestId}/jobstatus".format(
+            homeRegion=await self._get_home_region(vin.upper()),
             type=self._type,
             country=self._country,
             vin=vin.upper(),
@@ -102,7 +145,8 @@ class AudiService:
     async def request_current_vehicle_data(self, vin: str):
         self._api.use_token(self.vwToken)
         data = await self._api.post(
-            "https://msg.volkswagen.de/fs-car/bs/vsr/v1/{type}/{country}/vehicles/{vin}/requests".format(
+            "{homeRegion}/fs-car/bs/vsr/v1/{type}/{country}/vehicles/{vin}/requests".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -111,7 +155,8 @@ class AudiService:
     async def get_preheater(self, vin: str):
         self._api.use_token(self.vwToken)
         return await self._api.get(
-            "https://msg.volkswagen.de/fs-car/bs/rs/v1/{type}/{country}/vehicles/{vin}/status".format(
+            "{homeRegion}/fs-car/bs/rs/v1/{type}/{country}/vehicles/{vin}/status".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -119,7 +164,8 @@ class AudiService:
     async def get_preheater(self, vin: str):
         self._api.use_token(self.vwToken)
         return await self._api.get(
-            "https://msg.volkswagen.de/fs-car/bs/rs/v1/{type}/{country}/vehicles/{vin}/status".format(
+            "{homeRegion}/fs-car/bs/rs/v1/{type}/{country}/vehicles/{vin}/status".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -127,7 +173,8 @@ class AudiService:
     async def get_stored_vehicle_data(self, vin: str):
         self._api.use_token(self.vwToken)
         data = await self._api.get(
-            "https://msg.volkswagen.de/fs-car/bs/vsr/v1/{type}/{country}/vehicles/{vin}/status".format(
+            "{homeRegion}/fs-car/bs/vsr/v1/{type}/{country}/vehicles/{vin}/status".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -136,7 +183,8 @@ class AudiService:
     async def get_charger(self, vin: str):
         self._api.use_token(self.vwToken)
         return await self._api.get(
-            "https://msg.volkswagen.de/fs-car/bs/batterycharge/v1/{type}/{country}/vehicles/{vin}/charger".format(
+            "{homeRegion}/fs-car/bs/batterycharge/v1/{type}/{country}/vehicles/{vin}/charger".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -144,7 +192,8 @@ class AudiService:
     async def get_climater(self, vin: str):
         self._api.use_token(self.vwToken)
         return await self._api.get(
-            "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater".format(
+            "{homeRegion}/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -152,7 +201,8 @@ class AudiService:
     async def get_stored_position(self, vin: str):
         self._api.use_token(self.vwToken)
         return await self._api.get(
-            "https://msg.volkswagen.de/fs-car/bs/cf/v1/{type}/{country}/vehicles/{vin}/position".format(
+            "{homeRegion}/fs-car/bs/cf/v1/{type}/{country}/vehicles/{vin}/position".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -167,7 +217,8 @@ class AudiService:
     async def get_timer(self, vin: str):
         self._api.use_token(self.vwToken)
         return await self._api.get(
-            "https://msg.volkswagen.de/fs-car/bs/departuretimer/v1/{type}/{country}/vehicles/{vin}/timer".format(
+            "{homeRegion}/fs-car/bs/departuretimer/v1/{type}/{country}/vehicles/{vin}/timer".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             )
         )
@@ -181,13 +232,126 @@ class AudiService:
         )
 
     async def get_vehicle_information(self):
-        self._api.use_token(self.audiToken)
-        data = await self._api.get(
-            "https://msg.audi.de/myaudi/vehicle-management/v2/vehicles"
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "X-App-Name": "myAudi",
+            "X-App-Version": AudiAPI.HDR_XAPP_VERSION,
+            "Accept-Language": "{l}-{c}".format(
+                l=self._language, c=self._country.upper()
+            ),
+            "X-User-Country": self._country.upper(),
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+            "Authorization": "Bearer " + self.audiToken["access_token"],
+            "Content-Type": "application/json; charset=utf-8",
+        }
+        req_data = {
+            "query": "query vehicleList {\n userVehicles {\n vin\n mappingVin\n vehicle { core { modelYear\n }\n media { shortName\n longName }\n }\n csid\n commissionNumber\n type\n devicePlatform\n mbbConnect\n userRole {\n role\n }\n vehicle {\n classification {\n driveTrain\n }\n }\n nickname\n }\n}"
+        }
+        req_rsp, rep_rsptxt = await self._api.request(
+            "POST",
+            "https://app-api.live-my.audi.com/vgql/v1/graphql",
+            json.dumps(req_data),
+            headers=headers,
+            allow_redirects=False,
+            rsp_wtxt=True,
         )
+        vins = json.loads(rep_rsptxt)
+        if "data" not in vins:
+            raise Exception("Invalid json in get_vehicle_information")
+
         response = VehiclesResponse()
-        response.parse(data)
+        response.parse(vins["data"])
         return response
+
+    async def get_vehicle_data(self, vin: str):
+        self._api.use_token(self.vwToken)
+        data = await self._api.get(
+            "{homeRegion}/fs-car/vehicleMgmt/vehicledata/v2/{type}/{country}/vehicles/{vin}/".format(
+                homeRegion=await self._get_home_region(vin.upper()),
+                type=self._type, country=self._country, vin=vin.upper()
+            )
+        )
+
+    async def get_tripdata(self, vin: str, kind: str):
+        self._api.use_token(self.vwToken)
+
+        # read tripdata
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "X-App-Name": "myAudi",
+            "X-App-Version": AudiAPI.HDR_XAPP_VERSION,
+            "X-Client-ID": self.xclientId,
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+            "Authorization": "Bearer " + self.vwToken["access_token"],
+        }
+        td_reqdata = {
+            "type": "list",
+            "from": "1970-01-01T00:00:00Z",
+            # "from":(datetime.utcnow() - timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "to": (datetime.utcnow() + timedelta(minutes=90)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        data = await self._api.request(
+            "GET",
+            "{homeRegion}/api/bs/tripstatistics/v1/vehicles/{vin}/tripdata/{kind}".format(
+                homeRegion=await self._get_home_region_setter(vin.upper()),
+                vin=vin.upper(),
+                kind=kind,
+            ),
+            None,
+            params=td_reqdata,
+            headers=headers,
+        )
+        td_sorted = sorted(
+            data["tripDataList"]["tripData"],
+            key=lambda k: k["overallMileage"],
+            reverse=True,
+        )
+
+        td_current = td_sorted[0]
+        td_reset_trip = None
+
+        for trip in td_sorted:
+            if (td_current["startMileage"] - trip["startMileage"]) > 2:
+                td_reset_trip = trip
+                break
+            else:
+                td_current["tripID"] = trip["tripID"]
+                td_current["startMileage"] = trip["startMileage"]
+
+        return TripDataResponse(td_current), TripDataResponse(td_reset_trip)
+
+    async def _fill_home_region(self, vin: str):
+        self._homeRegion[vin] = "https://msg.volkswagen.de"
+        self._homeRegionSetter[vin] = "https://mal-1a.prd.ece.vwg-connect.com"
+
+        try:
+            self._api.use_token(self.vwToken)
+            res = await self._api.get("https://mal-1a.prd.ece.vwg-connect.com/api/cs/vds/v1/vehicles/{vin}/homeRegion".format(vin=vin))
+            if res != None and res.get("homeRegion") != None and res["homeRegion"].get("baseUri") != None and res["homeRegion"]["baseUri"].get("content") != None:
+                uri = res["homeRegion"]["baseUri"]["content"]
+                if uri != "https://mal-1a.prd.ece.vwg-connect.com/api":
+                    self._homeRegionSetter[vin] = uri.split("/api")[0]
+                    self._homeRegion[vin] = self._homeRegionSetter[vin].replace("mal-", "fal-")
+        except Exception:
+            pass
+
+    async def _get_home_region(self, vin: str):
+        if self._homeRegion.get(vin) != None:
+            return self._homeRegion[vin]
+
+        await self._fill_home_region(vin)
+
+        return self._homeRegion[vin]
+
+    async def _get_home_region_setter(self, vin: str):
+        if self._homeRegionSetter.get(vin) != None:
+            return self._homeRegionSetter[vin]
+
+        await self._fill_home_region(vin)
+
+        return self._homeRegionSetter[vin]
 
     async def _get_security_token(self, vin: str, action: str):
         # Challenge
@@ -201,7 +365,7 @@ class AudiService:
 
         body = await self._api.request(
             "GET",
-            "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/vehicles/"
+            "{homeRegionSetter}/api/rolesrights/authorization/v2/vehicles/".format(homeRegionSetter=await self._get_home_region_setter(vin.upper()))
             + vin.upper()
             + "/services/"
             + action
@@ -235,7 +399,7 @@ class AudiService:
 
         body = await self._api.request(
             "POST",
-            "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/security-pin-auth-completed",
+            "{homeRegionSetter}/api/rolesrights/authorization/v2/security-pin-auth-completed".format(homeRegionSetter=await self._get_home_region_setter(vin.upper())),
             headers=headers,
             data=json.dumps(data),
         )
@@ -270,14 +434,16 @@ class AudiService:
         )
         res = await self._api.request(
             "POST",
-            "https://msg.volkswagen.de/fs-car/bs/rlu/v1/{type}/{country}/vehicles/{vin}/actions".format(
+            "{homeRegion}/fs-car/bs/rlu/v1/{type}/{country}/vehicles/{vin}/actions".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             ),
             headers=headers,
             data=data,
         )
 
-        checkUrl = "https://msg.volkswagen.de/fs-car/bs/rlu/v1/{type}/{country}/vehicles/{vin}/requests/{requestId}/status".format(
+        checkUrl = "{homeRegion}/fs-car/bs/rlu/v1/{type}/{country}/vehicles/{vin}/requests/{requestId}/status".format(
+            homeRegion=await self._get_home_region(vin.upper()),
             type=self._type,
             country=self._country,
             vin=vin.upper(),
@@ -292,23 +458,29 @@ class AudiService:
             "requestStatusResponse.status",
         )
 
-    async def set_battery_charger(self, vin: str, start: bool):
-        data = '<?xml version="1.0" encoding= "UTF-8" ?><action><type>{action}</type></action>'.format(
-            action="start" if start else "stop"
-        )
+    async def set_battery_charger(self, vin: str, start: bool, timer: bool):
+        if start and timer:
+            data = '{ "action": { "type": "selectChargingMode", "settings": { "chargeModeSelection": { "value": "timerBasedCharging" } } }}'
+        elif start:
+            data = '{ "action": { "type": "start" }}'
+        else:
+            data = '{ "action": { "type": "stop" }}'
+
         headers = self._get_vehicle_action_header(
-            "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml", None
+            "application/json", None
         )
         res = await self._api.request(
             "POST",
-            "https://msg.volkswagen.de/fs-car/bs/batterycharge/v1/{type}/{country}/vehicles/{vin}/charger/actions".format(
+            "{homeRegion}/fs-car/bs/batterycharge/v1/{type}/{country}/vehicles/{vin}/charger/actions".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             ),
             headers=headers,
             data=data,
         )
 
-        checkUrl = "https://msg.volkswagen.de/fs-car/bs/batterycharge/v1/{type}/{country}/vehicles/{vin}/charger/actions/{actionid}".format(
+        checkUrl = "{homeRegion}/fs-car/bs/batterycharge/v1/{type}/{country}/vehicles/{vin}/charger/actions/{actionid}".format(
+            homeRegion=await self._get_home_region(vin.upper()),
             type=self._type,
             country=self._country,
             vin=vin.upper(),
@@ -325,23 +497,25 @@ class AudiService:
 
     async def set_climatisation(self, vin: str, start: bool):
         if start:
-            data = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><action><type>startClimatisation</type><settings><heaterSource>electric</heaterSource></settings></action>'
+            data = '{"action":{"type": "startClimatisation","settings": {"targetTemperature": 2940,"climatisationWithoutHVpower": true,"heaterSource": "electric","climaterElementSettings": {"isClimatisationAtUnlock": false, "isMirrorHeatingEnabled": true,}}}}'
         else:
-            data = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><action><type>stopClimatisation</type></action>'
+            data = '{"action":{"type": "stopClimatisation"}}'
 
         headers = self._get_vehicle_action_header(
-            "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml;charset=utf-8", None
+            'application/json', None
         )
         res = await self._api.request(
             "POST",
-            "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions".format(
+            "{homeRegion}/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             ),
             headers=headers,
             data=data,
         )
 
-        checkUrl = "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions/{actionid}".format(
+        checkUrl = "{homeRegion}/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions/{actionid}".format(
+            homeRegion=await self._get_home_region(vin.upper()),
             type=self._type,
             country=self._country,
             vin=vin.upper(),
@@ -366,14 +540,16 @@ class AudiService:
         )
         res = await self._api.request(
             "POST",
-            "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions".format(
+            "{homeRegion}/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             ),
             headers=headers,
             data=data,
         )
 
-        checkUrl = "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions/{actionid}".format(
+        checkUrl = "{homeRegion}/fs-car/bs/climatisation/v1/{type}/{country}/vehicles/{vin}/climater/actions/{actionid}".format(
+            homeRegion=await self._get_home_region(vin.upper()),
             type=self._type,
             country=self._country,
             vin=vin.upper(),
@@ -404,7 +580,8 @@ class AudiService:
         )
         await self._api.request(
             "POST",
-            "https://msg.volkswagen.de/fs-car/bs/rs/v1/{type}/{country}/vehicles/{vin}/action".format(
+            "{homeRegion}/fs-car/bs/rs/v1/{type}/{country}/vehicles/{vin}/action".format(
+                homeRegion=await self._get_home_region(vin.upper()),
                 type=self._type, country=self._country, vin=vin.upper()
             ),
             headers=headers,
@@ -435,132 +612,439 @@ class AudiService:
 
         raise Exception("Cannot {action}, operation timed out".format(action=action))
 
+    # TR/2022-12-20: New secrect for X_QMAuth
+    def _calculate_X_QMAuth(self):
+        # Calcualte X-QMAuth value
+        gmtime_100sec = int(
+            (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() / 100
+        )
+        xqmauth_secret = bytes([26,256-74,256-103,37,256-84,23,256-102,256-86,78,256-125,256-85,256-26,113,256-87,71,109,23,100,24,256-72,91,256-41,6,256-15,67,108,256-95,91,256-26,71,256-104,256-100])
+        xqmauth_val = hmac.new(
+            xqmauth_secret,
+            str(gmtime_100sec).encode("ascii", "ignore"),
+            digestmod="sha256",
+        ).hexdigest()
+
+        #v1:01da27b0:fbdb6e4ba3109bc68040cb83f380796f4d3bb178a626c4cc7e166815b806e4b5
+        return "v1:01da27b0:" + xqmauth_val
+
+    # TR/2021-12-01: Refresh token before it expires
+    # returns True when refresh was required and succesful, otherwise False
+    async def refresh_token_if_necessary(self, elapsed_sec: int) -> bool:
+        if self.mbboauthToken is None:
+            return False
+        if "refresh_token" not in self.mbboauthToken:
+            return False
+        if "expires_in" not in self.mbboauthToken:
+            return False
+
+        if (elapsed_sec + 5 * 60) < self.mbboauthToken["expires_in"]:
+            # refresh not needed now
+            return False
+
+        try:
+            headers = {
+                "Accept": "application/json",
+                "Accept-Charset": "utf-8",
+                "User-Agent": AudiAPI.HDR_USER_AGENT,
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-Client-ID": self.xclientId,
+            }
+            mbboauth_refresh_data = {
+                "grant_type": "refresh_token",
+                "token": self.mbboauthToken["refresh_token"],
+                "scope": "sc2:fal",
+                # "vin": vin,  << App uses a dedicated VIN here, but it works without, don't know
+            }
+            encoded_mbboauth_refresh_data = urlencode(mbboauth_refresh_data, encoding="utf-8").replace("+", "%20")
+            mbboauth_refresh_rsp, mbboauth_refresh_rsptxt = await self._api.request(
+                "POST",
+                self.mbbOAuthBaseURL + "/mobile/oauth2/v1/token",
+                encoded_mbboauth_refresh_data,
+                headers=headers,
+                allow_redirects=False,
+                rsp_wtxt=True,
+            )
+            
+            # this code is the old "vwToken"
+            self.vwToken = json.loads(mbboauth_refresh_rsptxt)
+            
+            # TR/2022-02-10: If a new refresh_token is provided, save it for further refreshes
+            if "refresh_token" in self.vwToken:
+                self.mbboauthToken["refresh_token"] = self.vwToken["refresh_token"]
+
+            # hdr
+            headers = {
+               "Accept": "application/json",
+               "Accept-Charset": "utf-8",
+               "X-QMAuth": self._calculate_X_QMAuth(),
+               "User-Agent": AudiAPI.HDR_USER_AGENT,
+               "Content-Type": "application/x-www-form-urlencoded",
+            }
+            # IDK token request data
+            tokenreq_data = {
+               "client_id": self._client_id,
+               "grant_type": "refresh_token",
+               "refresh_token": self._bearer_token_json.get("refresh_token"),
+               "response_type": "token id_token",
+            }
+            # IDK token request
+            encoded_tokenreq_data = urlencode(tokenreq_data, encoding="utf-8").replace("+","%20")
+            bearer_token_rsp, bearer_token_rsptxt = await self._api.request(
+               "POST",
+               self._tokenEndpoint,
+               encoded_tokenreq_data,
+               headers=headers,
+               allow_redirects=False,
+               rsp_wtxt=True,
+            )
+            self._bearer_token_json = json.loads(bearer_token_rsptxt)
+
+            # AZS token
+            headers = {
+               "Accept": "application/json",
+               "Accept-Charset": "utf-8",
+               "X-App-Version": AudiAPI.HDR_XAPP_VERSION,
+               "X-App-Name": "myAudi",
+               "User-Agent": AudiAPI.HDR_USER_AGENT,
+               "Content-Type": "application/json; charset=utf-8",
+            }
+            asz_req_data = {
+               "token": self._bearer_token_json["access_token"],
+               "grant_type": "id_token",
+               "stage": "live",
+               "config": "myaudi",
+            }
+            azs_token_rsp, azs_token_rsptxt = await self._api.request(
+               "POST",
+               self._authorizationServerBaseURLLive + "/token",
+               json.dumps(asz_req_data),
+               headers=headers,
+               allow_redirects=False,
+               rsp_wtxt=True,
+            )
+            azs_token_json = json.loads(azs_token_rsptxt)
+            self.audiToken = azs_token_json
+
+            return True
+
+        except Exception as exception:
+            _LOGGER.error("Refresh token failed: " + str(exception))
+            return False
+
+    # TR/2021-12-01 updated to match behaviour of Android myAudi 4.5.0
     async def login_request(self, user: str, password: str):
-        if self._country.upper() == "US":
-            await self.login_request_v1(user, password)
-        else:
-            await self.login_request_v2(user, password)
-
-    async def login_request_v1(self, user: str, password: str):
-        # Get Audi Token
         self._api.use_token(None)
-        data = {
-            "client_id": "mmiconnect_android",
-            "scope": "openid profile email mbb offline_access mbbuserid myaudi selfservice:read selfservice:write",
-            "response_type": "token id_token",
-            "grant_type": "password",
-            "username": user,
-            "password": password,
-        }
+        self._api.set_xclient_id(None)
+        self.xclientId = None
 
-        self.audiToken = await self._api.post(
-            "https://id.audi.com/v1/token", data, use_json=False
+        # get markets
+        markets_json = await self._api.request(
+            "GET",
+            "https://content.app.my.audi.com/service/mobileapp/configurations/markets",
+            None,
         )
+        if (
+            self._country.upper()
+            not in markets_json["countries"]["countrySpecifications"]
+        ):
+            raise Exception("Country not found")
+        self._language = markets_json["countries"]["countrySpecifications"][
+            self._country.upper()
+        ]["defaultLanguage"]
 
-        # Get VW Token
-        data = {
-            "grant_type": "id_token",
-            "token": self.audiToken.get("id_token"),
-            "scope": "sc2:fal",
-        }
-
-        headers = {
-            "User-Agent": "okhttp/3.7.0",
-            "X-App-Version": "3.14.0",
-            "X-App-Name": "myAudi",
-            "X-Client-Id": "77869e21-e30a-4a92-b016-48ab7d3db1d8",
-            "Host": "mbboauth-1d.prd.ece.vwg-connect.com",
-        }
-
-        self.vwToken = await self._api.request(
-            "POST",
-            "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token",
-            headers=headers,
-            data=data,
+        # Dynamic configuration URLs
+        marketcfg_url = "https://content.app.my.audi.com/service/mobileapp/configurations/market/{c}/{l}?v=4.15.0".format(
+            c=self._country, l=self._language
         )
+        openidcfg_url = "https://{0}.bff.cariad.digital/login/v1/idk/openid-configuration".format(
+           "na" if self._country.upper() == "US" else "emea")
 
-    # 13.09.2020 New login taken from https://github.com/davidgiga1993/AudiAPI/issues/13
-    async def login_request_v2(self, user: str, password: str):
-        self._api.use_token(None)
+        # get market config
+        marketcfg_json = await self._api.request("GET", marketcfg_url, None)
 
-        # OpenID Configuration
-        openIdConfig = await self._api.get(
-            "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/openid-configuration"
+        # use dynamic config from marketcfg
+        self._client_id = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com"
+        if "idkClientIDAndroidLive" in marketcfg_json:
+            self._client_id = marketcfg_json["idkClientIDAndroidLive"]
+
+        self._authorizationServerBaseURLLive = "https://emea.bff.cariad.digital/login/v1/audi"
+        if "authorizationServerBaseURLLive" in marketcfg_json:
+            self._authorizationServerBaseURLLive = marketcfg_json[
+                "authorizationServerBaseURLLive"
+            ]
+        self.mbbOAuthBaseURL = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth"
+        if "mbbOAuthBaseURLLive" in marketcfg_json:
+            self.mbbOAuthBaseURL = marketcfg_json["mbbOAuthBaseURLLive"]
+
+        # get openId config
+        openidcfg_json = await self._api.request("GET", openidcfg_url, None)
+
+        # use dynamic config from openId config
+        authorization_endpoint = "https://identity.vwgroup.io/oidc/v1/authorize"
+        if "authorization_endpoint" in openidcfg_json:
+            authorization_endpoint = openidcfg_json["authorization_endpoint"]
+        self._tokenEndpoint = "https://emea.bff.cariad.digital/login/v1/idk/token"
+        if "token_endpoint" in openidcfg_json:
+            self._tokenEndpoint = openidcfg_json["token_endpoint"]
+        revocation_endpoint = (
+            "https://emea.bff.cariad.digital/login/v1/idk/revoke"
         )
-        authorization_endpoint = openIdConfig.get("authorization_endpoint")
+        if revocation_endpoint in openidcfg_json:
+            revocation_endpoint = openidcfg_json["revocation_endpoint"]
 
+        # generate code_challenge
+        code_verifier = str(base64.urlsafe_b64encode(os.urandom(32)), "utf-8").strip(
+            "="
+        )
+        code_challenge = str(
+            base64.urlsafe_b64encode(
+                sha256(code_verifier.encode("ascii", "ignore")).digest()
+            ),
+            "utf-8",
+        ).strip("=")
+        code_challenge_method = "S256"
+
+        #
         state = str(uuid.uuid4())
         nonce = str(uuid.uuid4())
 
-        # Authorization code
-        query_params = {
-            "response_type": "token id_token",
-            "client_id": CLIENT_ID,
+        # login page
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "X-App-Version": AudiAPI.HDR_XAPP_VERSION,
+            "X-App-Name": "myAudi",
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+        }
+        idk_data = {
+            "response_type": "code",
+            "client_id": self._client_id,
             "redirect_uri": "myaudi:///",
-            "scope": "address profile badge birthdate birthplace nationalIdentifier nationality profession email "
-            "vin phone nickname name picture mbb gallery openid",
+            "scope": "address profile badge birthdate birthplace nationalIdentifier nationality profession email vin phone nickname name picture mbb gallery openid",
             "state": state,
             "nonce": nonce,
             "prompt": "login",
-            "ui_locales": "en-US en",
+            "code_challenge": code_challenge,
+            "code_challenge_method": code_challenge_method,
+            "ui_locales": "de-de de",
         }
-
-        reply = await self._api.get(
+        idk_rsp, idk_rsptxt = await self._api.request(
+            "GET",
             authorization_endpoint,
-            raw_reply=True,
+            None,
+            headers=headers,
+            params=idk_data,
+            rsp_wtxt=True,
+        )
+
+        # form_data with email
+        submit_data = self.get_hidden_html_input_form_data(idk_rsptxt, {"email": user})
+        submit_url = self.get_post_url(idk_rsptxt, authorization_endpoint)
+        # send email
+        email_rsp, email_rsptxt = await self._api.request(
+            "POST",
+            submit_url,
+            submit_data,
+            headers=headers,
+            cookies=idk_rsp.cookies,
+            allow_redirects=True,
+            rsp_wtxt=True,
+        )
+
+        # form_data with password
+        # 2022-01-29: new HTML response uses a js two build the html form data + button.
+        #             Therefore it's not possible to extract hmac and other form data. 
+        #             --> extract hmac from embedded js snippet.
+        regex_res = re.findall('"hmac"\s*:\s*"[0-9a-fA-F]+"', email_rsptxt)
+        if regex_res:
+           submit_url = submit_url.replace("identifier", "authenticate")
+           submit_data["hmac"] = regex_res[0].split(":")[1].strip('"')
+           submit_data["password"] = password
+        else:
+           submit_data = self.get_hidden_html_input_form_data(email_rsptxt, {"password": password})
+           submit_url = self.get_post_url(email_rsptxt, submit_url)
+
+        # send password
+        pw_rsp, pw_rsptxt = await self._api.request(
+            "POST",
+            submit_url,
+            submit_data,
+            headers=headers,
+            cookies=idk_rsp.cookies,
             allow_redirects=False,
-            params=query_params,
+            rsp_wtxt=True,
         )
 
-        # Submit the email
-        reply = await self._emulate_browser(
-            BrowserLoginResponse(reply, authorization_endpoint), {"email": user}
+        # forward1 after pwd
+        fwd1_rsp, fwd1_rsptxt = await self._api.request(
+            "GET",
+            pw_rsp.headers["Location"],
+            None,
+            headers=headers,
+            cookies=idk_rsp.cookies,
+            allow_redirects=False,
+            rsp_wtxt=True,
         )
-        # Submit the password
-        reply = await self._emulate_browser(reply, {"password": password})
+        # forward2 after pwd
+        fwd2_rsp, fwd2_rsptxt = await self._api.request(
+            "GET",
+            fwd1_rsp.headers["Location"],
+            None,
+            headers=headers,
+            cookies=idk_rsp.cookies,
+            allow_redirects=False,
+            rsp_wtxt=True,
+        )
+        # get tokens
+        codeauth_rsp, codeauth_rsptxt = await self._api.request(
+            "GET",
+            fwd2_rsp.headers["Location"],
+            None,
+            headers=headers,
+            cookies=fwd2_rsp.cookies,
+            allow_redirects=False,
+            rsp_wtxt=True,
+        )
+        authcode_parsed = urlparse(
+            codeauth_rsp.headers["Location"][len("myaudi:///?") :]
+        )
+        authcode_strings = parse_qs(authcode_parsed.path)
 
-        sso_url = reply.get_location()
-        sso_reply = await self._api.get(sso_url, raw_reply=True, allow_redirects=False)
-        consent_url = BrowserLoginResponse(sso_reply, sso_url).get_location()
-        consent_reply = await self._api.get(
-            consent_url, raw_reply=True, allow_redirects=False
+        # hdr
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "X-QMAuth": self._calculate_X_QMAuth(),
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+        # IDK token request data
+        tokenreq_data = {
+            "client_id": self._client_id,
+            "grant_type": "authorization_code",
+            "code": authcode_strings["code"][0],
+            "redirect_uri": "myaudi:///",
+            "response_type": "token id_token",
+            "code_verifier": code_verifier,
+        }
+        # IDK token request
+        encoded_tokenreq_data = urlencode(tokenreq_data, encoding="utf-8").replace("+","%20")
+        bearer_token_rsp, bearer_token_rsptxt = await self._api.request(
+            "POST",
+            self._tokenEndpoint,
+            encoded_tokenreq_data,
+            headers=headers,
+            allow_redirects=False,
+            rsp_wtxt=True,
         )
-        success_url = BrowserLoginResponse(consent_reply, consent_url).get_location()
-        success_reply = await self._api.get(
-            success_url, raw_reply=True, allow_redirects=False
-        )
-        query_strings = parse_qs(
-            urlparse(success_reply.headers.get("location")).fragment
-        )
-        access_token = query_strings["access_token"][0]
-        id_token = query_strings["id_token"][0]
+        self._bearer_token_json = json.loads(bearer_token_rsptxt)
 
-        # Get the Audi Token
-        data = {
-            "config": "myaudi",
+        # AZS token
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "X-App-Version": AudiAPI.HDR_XAPP_VERSION,
+            "X-App-Name": "myAudi",
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+            "Content-Type": "application/json; charset=utf-8",
+        }
+        asz_req_data = {
+            "token": self._bearer_token_json["access_token"],
             "grant_type": "id_token",
             "stage": "live",
-            "token": access_token,
+            "config": "myaudi",
         }
-        reply = await self._api.post(
-            "https://app-api.live-my.audi.com/azs/v1/token", data=data
-        )
-        self.audiToken = reply
-
-        # Get the VW Token
-        data = {
-            "grant_type": "id_token",
-            "scope": "sc2:fal",
-            "token": id_token,
-        }
-        headers = {"X-Client-ID": XCLIENT_ID}
-        reply = await self._api.post(
-            "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token",
-            data=data,
+        azs_token_rsp, azs_token_rsptxt = await self._api.request(
+            "POST",
+            self._authorizationServerBaseURLLive + "/token",
+            json.dumps(asz_req_data),
             headers=headers,
-            use_json=False,
+            allow_redirects=False,
+            rsp_wtxt=True,
         )
-        self.vwToken = reply
+        azs_token_json = json.loads(azs_token_rsptxt)
+        self.audiToken = azs_token_json
+
+        # mbboauth client register
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+            "Content-Type": "application/json; charset=utf-8",
+        }
+        mbboauth_reg_data = {
+            "client_name": "SM-A405FN",
+            "platform": "google",
+            "client_brand": "Audi",
+            "appName": "myAudi",
+            "appVersion": AudiAPI.HDR_XAPP_VERSION,
+            "appId": "de.myaudi.mobile.assistant",
+        }
+        mbboauth_client_reg_rsp, mbboauth_client_reg_rsptxt = await self._api.request(
+            "POST",
+            self.mbbOAuthBaseURL + "/mobile/register/v1",
+            json.dumps(mbboauth_reg_data),
+            headers=headers,
+            allow_redirects=False,
+            rsp_wtxt=True,
+        )
+        mbboauth_client_reg_json = json.loads(mbboauth_client_reg_rsptxt)
+        self.xclientId = mbboauth_client_reg_json["client_id"]
+        self._api.set_xclient_id(self.xclientId)
+
+        # mbboauth auth
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Client-ID": self.xclientId,
+        }
+        mbboauth_auth_data = {
+            "grant_type": "id_token",
+            "token": self._bearer_token_json["id_token"],
+            "scope": "sc2:fal",
+        }
+        encoded_mbboauth_auth_data = urlencode(mbboauth_auth_data, encoding="utf-8").replace("+","%20")
+        mbboauth_auth_rsp, mbboauth_auth_rsptxt = await self._api.request(
+            "POST",
+            self.mbbOAuthBaseURL + "/mobile/oauth2/v1/token",
+            encoded_mbboauth_auth_data,
+            headers=headers,
+            allow_redirects=False,
+            rsp_wtxt=True,
+        )
+        mbboauth_auth_json = json.loads(mbboauth_auth_rsptxt)
+        # store token and expiration time
+        self.mbboauthToken = mbboauth_auth_json
+
+        # mbboauth refresh (app immediately refreshes the token)
+        headers = {
+            "Accept": "application/json",
+            "Accept-Charset": "utf-8",
+            "User-Agent": AudiAPI.HDR_USER_AGENT,
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Client-ID": self.xclientId,
+        }
+        mbboauth_refresh_data = {
+            "grant_type": "refresh_token",
+            "token": mbboauth_auth_json["refresh_token"],
+            "scope": "sc2:fal",
+            # "vin": vin,  << App uses a dedicated VIN here, but it works without, don't know
+        }
+        encoded_mbboauth_refresh_data = urlencode(mbboauth_refresh_data, encoding="utf-8").replace("+","%20")
+        mbboauth_refresh_rsp, mbboauth_refresh_rsptxt = await self._api.request(
+            "POST",
+            self.mbbOAuthBaseURL + "/mobile/oauth2/v1/token",
+            encoded_mbboauth_refresh_data,
+            headers=headers,
+            allow_redirects=False,
+            cookies=mbboauth_client_reg_rsp.cookies,
+            rsp_wtxt=True,
+        )
+        # this code is the old "vwToken"
+        self.vwToken = json.loads(mbboauth_refresh_rsptxt)
 
     def _generate_security_pin_hash(self, challenge):
         pin = to_byte_array(self._spin)
@@ -575,7 +1059,7 @@ class AudiService:
         login_location = reply.get_location()
         page_reply = await self._api.get(login_location, raw_contents=True)
 
-        # Now parse the html body and extract the target url, csfr token and other required parameters
+        # Now parse the html body and extract the target url, csrf token and other required parameters
         html = BeautifulSoup(page_reply, "html.parser")
         form_tag = html.find("form")
 

@@ -1,0 +1,16 @@
+{
+  "pre-install": {},
+  "apt": {
+    "python3-requests": {},
+    "python3-bs4": {}
+  },
+  "pip3": {
+    "requests": {},
+    "voluptuous": {},
+    "aiohttp": {}
+  },
+  "npm": {},
+  "yarn": {},
+  "plugin": {},
+  "post-install": {}
+}

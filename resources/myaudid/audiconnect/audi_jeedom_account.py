@@ -41,11 +41,8 @@ class AudiAccount(AudiConnectObserver):
         tmp["csid"] = vehicle.csid
         tmp["title"] = vehicle.title
         tmp["model"] = vehicle.model
-        tmp["brand"] = vehicle.brand
         tmp["model_year"] = vehicle.model_year
-        tmp["type"] = vehicle.type
         tmp["model_family"] = vehicle.model_family
-        tmp["model_full"] = vehicle.model_full
 
         tmp["support_status_report"] = False
         tmp["support_ac"] = False

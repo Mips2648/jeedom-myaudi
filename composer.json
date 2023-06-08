@@ -8,6 +8,6 @@
         }
     ],
     "require": {
-        "mips/jeedom-tools": "~0.3"
+        "mips/jeedom-tools": ">=0.18"
     }
 }
