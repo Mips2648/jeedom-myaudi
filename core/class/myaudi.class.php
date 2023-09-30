@@ -135,6 +135,7 @@ class myaudi extends eqLogic {
 	}
 
 	public static function syncVehicle($vehicle) {
+		/** @var myaudi */
 		$eqLogic = eqLogic::byLogicalId($vehicle['vehicle'], __CLASS__);
 		if (!is_object($eqLogic)) {
 			log::add(__CLASS__, 'info', 'Creating new vehicle with vin="' . $vehicle['vehicle'] . '" and csid="' . $vehicle['csid'] . '"');
@@ -268,6 +269,7 @@ class myaudiCmd extends cmd {
 
 	public function execute($_options = array()) {
 
+		/** @var myaudi */
 		$eqlogic = $this->getEqLogic();
 
 		switch ($this->getLogicalId()) {
