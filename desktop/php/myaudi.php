@@ -21,7 +21,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                 <br>
                 <span>{{Documentation}}</span>
             </div>
-            <div class="cursor pluginAction logoSecondary" data-action="openLocation" data-location="https://community.jeedom.com/tags/plugin-<?= $plugin->getId() ?>">
+            <div class="cursor pluginAction logoSecondary" data-action="openLocation" data-location="https://community.jeedom.com/tag/plugin-<?= $plugin->getId() ?>">
                 <i class="fas fa-comments"></i>
                 <br>
                 <span>Community</span>

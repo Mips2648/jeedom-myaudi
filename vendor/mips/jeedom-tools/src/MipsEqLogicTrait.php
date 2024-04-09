@@ -141,4 +141,60 @@ trait MipsEqLogicTrait {
 		socket_write($socket, $payLoad, strlen($payLoad));
 		socket_close($socket);
 	}
+
+	public static function getConfigForCommunity() {
+		/** @var plugin */
+		$plugin = plugin::byId(__CLASS__);
+
+		$return = "<br>*Remplacez ce texte par une capture d'écran de la page santé Jeedom*<br><br>";
+		if ($plugin->getHasDependency()) {
+			if (file_exists(log::getPathToLog($plugin->getId() . '_update'))) {
+				$return .= "Log des dépendances:<br>```<br><br>collez ici le contenu du log {$plugin->getId()}_update<br><br>```<br>";
+			} elseif (file_exists(log::getPathToLog($plugin->getId() . '_packages'))) {
+				$return .= "Log des dépendances:<br>```<br><br>collez ici le contenu du log {$plugin->getId()}_packages<br><br>```<br>";
+			}
+		}
+		if ($plugin->getHasOwnDeamon()) {
+			$return .= "Log du démon:<br>```<br><br>collez ici le contenu du log {$plugin->getId()}_daemon<br><br>```<br>";
+		}
+		$return .= "Log du plugin:<br>```<br><br>collez ici le contenu du log {$plugin->getId()}<br><br>```<br>";
+
+		return $return;
+	}
+
+	private static function pythonRequirementsInstalled(string $pythonPath, string $requirementsPath) {
+		exec("{$pythonPath} -m pip freeze", $packages_installed);
+		$packages = join("||", $packages_installed);
+		exec("cat {$requirementsPath}", $packages_needed);
+		foreach ($packages_needed as $line) {
+			if (preg_match('/([^\s]+)[\s]*([>=~]=)[\s]*([\d+\.?]+)$/', $line, $need) === 1) {
+				if (preg_match('/' . $need[1] . '==([\d+\.?]+)/', $packages, $install) === 1) {
+					if ($need[2] == '==' && $need[3] != $install[1]) {
+						return false;
+					} elseif (version_compare($need[3], $install[1], '>')) {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	protected static function logDebug(string $message, string $logicalId = '') {
+		log::add(__CLASS__, 'debug', $message, $logicalId);
+	}
+
+	protected static function logInfo(string $message, string $logicalId = '') {
+		log::add(__CLASS__, 'info', $message, $logicalId);
+	}
+
+	protected static function logWarning(string $message, string $logicalId = '') {
+		log::add(__CLASS__, 'warning', $message, $logicalId);
+	}
+
+	protected static function logError(string $message, string $logicalId = '') {
+		log::add(__CLASS__, 'error', $message, $logicalId);
+	}
 }
