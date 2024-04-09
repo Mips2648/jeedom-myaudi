@@ -23,8 +23,11 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 class myaudi extends eqLogic {
 	use MipsEqLogicTrait;
 
-	// private static $PICTURES_DIR = __DIR__ . "/../../data/pictures/";
 	public static $_encryptConfigKey = array('user', 'password', 'spin', 'googleMapsAPIKey');
+
+	protected static function getSocketPort() {
+		return config::byKey('socketport', __CLASS__, 55066);;
+	}
 
 	public static function deamon_info() {
 		$return = array();
@@ -62,7 +65,7 @@ class myaudi extends eqLogic {
 		$path = realpath(dirname(__FILE__) . '/../../resources/myaudid');
 		$cmd = 'sudo python3 ' . $path . '/myaudid.py';
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
-		$cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55066');
+		$cmd .= ' --socketport ' . self::getSocketPort();
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/myaudi/core/php/jeeMyAudi.php';
 		$cmd .= ' --user "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"';
 		$cmd .= ' --pswd "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"';
@@ -121,19 +124,6 @@ class myaudi extends eqLogic {
 		}
 	}
 
-	public static function sendToDaemon($params) {
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['state'] != 'ok') {
-			throw new Exception("Le démon n'est pas démarré");
-		}
-		$params['apikey'] = jeedom::getApiKey(__CLASS__);
-		$payLoad = json_encode($params);
-		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
-		socket_connect($socket, '127.0.0.1', config::byKey('socketport', __CLASS__, '55066'));
-		socket_write($socket, $payLoad, strlen($payLoad));
-		socket_close($socket);
-	}
-
 	public static function syncVehicle($vehicle) {
 		/** @var myaudi */
 		$eqLogic = eqLogic::byLogicalId($vehicle['vehicle'], __CLASS__);
@@ -151,13 +141,6 @@ class myaudi extends eqLogic {
 		$eqLogic->setConfiguration('model', $vehicle['model']);
 		$eqLogic->save();
 
-		//if (!file_exists(myaudi::$PICTURES_DIR)) {
-		//mkdir(myaudi::$PICTURES_DIR, 0777, true);
-		//}
-		//$filepath = myaudi::$PICTURES_DIR.$vehicle['vehicle'].'-'.$vehicle['csid'].'.png';
-		//if (!file_exists($filepath)) {
-		//file_put_contents($filepath, file_get_contents($vehicle['data']['Vehicle']['LifeData']['MediaData'][0]['URL']));
-		//}
 		$commandsConfig = $eqLogic->getCommandsFileContent(__DIR__ . '/../config/commands.json');
 		$eqLogic->createCommandsFromConfig($commandsConfig['vehicle']);
 		if ($vehicle['support_status_report']) $eqLogic->createCommandsFromConfig($commandsConfig['status']);
@@ -227,19 +210,6 @@ class myaudi extends eqLogic {
 			$eqLogic->refreshWidget();
 		}
 	}
-
-	// public function getImage($returnPluginIcon = true) {
-	// 	$file = "{$this->getLogicalId()}-{$this->getConfiguration('csid')}.png";
-	// 	log::add(__CLASS__, 'debug', "get image {$file}");
-	// 	if (file_exists(myaudi::$PICTURES_DIR . $file)) {
-	// 		return "plugins/myaudi/data/pictures/{$file}";
-	// 	}
-	// 	log::add(__CLASS__, 'debug', "not found?");
-	// 	if ($returnPluginIcon) {
-	// 		return parent::getImage();
-	// 	}
-	// 	return '';
-	// }
 
 	public function refresh() {
 		$params = array('method' => 'getVehicleData', 'vin' => $this->getLogicalId());

@@ -2,20 +2,20 @@
     "packages": [
         {
             "name": "mips/jeedom-tools",
-            "version": "v0.18",
-            "version_normalized": "0.18.0.0",
+            "version": "v0.22",
+            "version_normalized": "0.22.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mips2648/jeedom-tools.git",
-                "reference": "e4b72769e625f82644a8f9626f9dabc1f2dc21f9"
+                "reference": "7399a5da77b442e423b7915095ea88f69b410780"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/e4b72769e625f82644a8f9626f9dabc1f2dc21f9",
-                "reference": "e4b72769e625f82644a8f9626f9dabc1f2dc21f9",
+                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/7399a5da77b442e423b7915095ea88f69b410780",
+                "reference": "7399a5da77b442e423b7915095ea88f69b410780",
                 "shasum": ""
             },
-            "time": "2022-05-19T16:01:15+00:00",
+            "time": "2024-04-09T08:13:22+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -35,7 +35,7 @@
             "description": "Jeedom tools for plugin dev",
             "support": {
                 "issues": "https://github.com/Mips2648/jeedom-tools/issues",
-                "source": "https://github.com/Mips2648/jeedom-tools/tree/v0.18"
+                "source": "https://github.com/Mips2648/jeedom-tools/tree/v0.22"
             },
             "install-path": "../mips/jeedom-tools"
         }
