@@ -29,6 +29,14 @@ class myaudi extends eqLogic {
 		return config::byKey('socketport', __CLASS__, 55066);;
 	}
 
+	private static function getPython3() {
+		// TODO: to be remove when core min version is >= 4.4.7, then we can directly use system::getCmdPython3(__CLASS__)
+		if (method_exists('system', 'getCmdPython3')) {
+			return system::getCmdPython3(__CLASS__);
+		}
+		return 'python3 ';
+	}
+
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = __CLASS__;
@@ -62,8 +70,8 @@ class myaudi extends eqLogic {
 			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
 		}
 
-		$path = realpath(dirname(__FILE__) . '/../../resources/myaudid');
-		$cmd = 'sudo python3 ' . $path . '/myaudid.py';
+		$path = realpath(__DIR__ . '/../../resources/myaudid/myaudid.py');
+		$cmd = 'sudo ' . self::getPython3() . $path;
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
 		$cmd .= ' --socketport ' . self::getSocketPort();
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/myaudi/core/php/jeeMyAudi.php';
