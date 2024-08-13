@@ -2,7 +2,7 @@
     "vehicle": [
         {
             "logicalId": "refresh",
-            "name": "Rafraichir",
+            "name": "{{Rafraichir}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
@@ -11,21 +11,21 @@
     "status": [
         {
             "logicalId": "lock",
-            "name": "Verrouiller",
+            "name": "{{Verrouiller}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "unlock",
-            "name": "Déverrouiller",
+            "name": "{{Déverrouiller}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "UTC_TIME_AND_KILOMETER_STATUS",
-            "name": "Kilométrage",
+            "name": "{{Kilométrage}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -38,7 +38,7 @@
         },
         {
             "logicalId": "MAINTENANCE_INTERVAL_DISTANCE_TO_OIL_CHANGE",
-            "name": "Prochaine vidange huile (km)",
+            "name": "{{Prochaine vidange huile (km)}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -51,7 +51,7 @@
         },
         {
             "logicalId": "MAINTENANCE_INTERVAL_TIME_TO_OIL_CHANGE",
-            "name": "Prochaine vidange huile (jours)",
+            "name": "{{Prochaine vidange huile (jours)}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -64,7 +64,7 @@
         },
         {
             "logicalId": "MAINTENANCE_INTERVAL_DISTANCE_TO_INSPECTION",
-            "name": "Prochain entretien (km)",
+            "name": "{{Prochain entretien (km)}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -77,7 +77,7 @@
         },
         {
             "logicalId": "MAINTENANCE_INTERVAL_TIME_TO_INSPECTION",
-            "name": "Prochain entretien (jours)",
+            "name": "{{Prochain entretien (jours)}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -90,7 +90,7 @@
         },
         {
             "logicalId": "TEMPERATURE_OUTSIDE",
-            "name": "Température extérieur",
+            "name": "{{Température extérieur}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -103,7 +103,7 @@
         },
         {
             "logicalId": "WARNING_OIL_CHANGE",
-            "name": "Avertissement changement huile",
+            "name": "{{Avertissement changement huile}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 1,
@@ -115,7 +115,7 @@
         },
         {
             "logicalId": "OIL_LEVEL_AMOUNT_IN_LITERS",
-            "name": "Niveau huile",
+            "name": "{{Niveau huile}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -128,7 +128,7 @@
         },
         {
             "logicalId": "OIL_LEVEL_MINIMUM_WARNING",
-            "name": "Avertissement niveau huile",
+            "name": "{{Avertissement niveau huile}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 1,
@@ -140,7 +140,7 @@
         },
         {
             "logicalId": "OIL_LEVEL_DIPSTICKS_PERCENTAGE",
-            "name": "Pourcentage niveau huile",
+            "name": "{{Pourcentage niveau huile}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -157,7 +157,7 @@
         },
         {
             "logicalId": "ADBLUE_RANGE",
-            "name": "Autonomie AdBlue",
+            "name": "{{Autonomie AdBlue}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -170,7 +170,7 @@
         },
         {
             "logicalId": "TOTAL_RANGE",
-            "name": "Autonomie totale",
+            "name": "{{Autonomie totale}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -183,7 +183,7 @@
         },
         {
             "logicalId": "TANK_LEVEL_IN_PERCENTAGE",
-            "name": "Pourcentage niveau réservoir",
+            "name": "{{Pourcentage niveau réservoir}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -200,7 +200,7 @@
         },
         {
             "logicalId": "LOCK_STATE_LEFT_FRONT_DOOR",
-            "name": "Porte avant gauche verrouillée",
+            "name": "{{Porte avant gauche verrouillée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -212,7 +212,7 @@
         },
         {
             "logicalId": "LOCK_STATE_LEFT_REAR_DOOR",
-            "name": "Porte arrière gauche verrouillée",
+            "name": "{{Porte arrière gauche verrouillée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -224,7 +224,7 @@
         },
         {
             "logicalId": "LOCK_STATE_RIGHT_FRONT_DOOR",
-            "name": "Porte avant droite verrouillée",
+            "name": "{{Porte avant droite verrouillée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -236,7 +236,7 @@
         },
         {
             "logicalId": "LOCK_STATE_RIGHT_REAR_DOOR",
-            "name": "Porte arrière droite verrouillée",
+            "name": "{{Porte arrière droite verrouillée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -248,7 +248,7 @@
         },
         {
             "logicalId": "LOCK_STATE_VEHICLE",
-            "name": "Véhicule verrouillé",
+            "name": "{{Véhicule verrouillé}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 1,
@@ -260,7 +260,7 @@
         },
         {
             "logicalId": "OPEN_STATE_LEFT_FRONT_DOOR",
-            "name": "Porte avant gauche fermée",
+            "name": "{{Porte avant gauche fermée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -272,7 +272,7 @@
         },
         {
             "logicalId": "OPEN_STATE_LEFT_REAR_DOOR",
-            "name": "Porte arrière gauche fermée",
+            "name": "{{Porte arrière gauche fermée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -284,7 +284,7 @@
         },
         {
             "logicalId": "OPEN_STATE_RIGHT_FRONT_DOOR",
-            "name": "Porte avant droite fermée",
+            "name": "{{Porte avant droite fermée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -296,7 +296,7 @@
         },
         {
             "logicalId": "OPEN_STATE_RIGHT_REAR_DOOR",
-            "name": "Porte arrière droite fermée",
+            "name": "{{Porte arrière droite fermée}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -308,7 +308,7 @@
         },
         {
             "logicalId": "OPEN_STATE_VEHICLE",
-            "name": "Portes fermées",
+            "name": "{{Portes fermées}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 1,
@@ -320,7 +320,7 @@
         },
         {
             "logicalId": "LOCK_STATE_TRUNK_LID",
-            "name": "Hayon verouillé",
+            "name": "{{Hayon verouillé}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 0,
@@ -332,7 +332,7 @@
         },
         {
             "logicalId": "OPEN_STATE_TRUNK_LID",
-            "name": "Hayon fermé",
+            "name": "{{Hayon fermé}}",
             "type": "info",
             "subtype": "binary",
             "isVisible": 1,
@@ -346,14 +346,14 @@
     "charger": [
         {
             "logicalId": "charger_start",
-            "name": "Démarrer le chargeur",
+            "name": "{{Démarrer le chargeur}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "charger_stop",
-            "name": "Arrêter le chargeur",
+            "name": "{{Arrêter le chargeur}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
@@ -362,14 +362,14 @@
     "climatisation": [
         {
             "logicalId": "ac_start",
-            "name": "Démarrer la climatisation",
+            "name": "{{Démarrer la climatisation}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "ac_stop",
-            "name": "Arrêter la climatisation",
+            "name": "{{Arrêter la climatisation}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
@@ -378,7 +378,7 @@
     "position": [
         {
             "logicalId": "LOCATION",
-            "name": "Localisation",
+            "name": "{{Localisation}}",
             "type": "info",
             "subtype": "string",
             "isVisible": 1,
@@ -400,28 +400,28 @@
     "preheater": [
         {
             "logicalId": "preheater_start",
-            "name": "Démarrer le préchauffage",
+            "name": "{{Démarrer le préchauffage}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "preheater_stop",
-            "name": "Arrêter le préchauffage",
+            "name": "{{Arrêter le préchauffage}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "defrost_start",
-            "name": "Démarrer le dégivrage",
+            "name": "{{Démarrer le dégivrage}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1
         },
         {
             "logicalId": "defrost__stop",
-            "name": "Arrêter le dégivrage",
+            "name": "{{Arrêter le dégivrage}}",
             "type": "action",
             "subtype": "other",
             "isVisible": 1

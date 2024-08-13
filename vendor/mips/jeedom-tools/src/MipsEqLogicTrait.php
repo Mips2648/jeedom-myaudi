@@ -9,6 +9,7 @@ trait MipsEqLogicTrait {
 		if (!is_json($content)) {
 			throw new RuntimeException("Fichier de configuration incorrecte:{$filePath}");
 		}
+		$content = translate::exec($content, realpath($filePath));
 		return json_decode($content, true);
 	}
 
@@ -44,6 +45,9 @@ trait MipsEqLogicTrait {
 			$cmd->setSubType($cmdDef["subtype"]);
 			if (isset($cmdDef["generic_type"])) {
 				$cmd->setGeneric_type($cmdDef["generic_type"]);
+			}
+			if (isset($cmdDef["order"])) {
+				$cmd->setOrder($cmdDef["order"]);
 			}
 			if (isset($cmdDef['display'])) {
 				foreach ($cmdDef['display'] as $key => $value) {
