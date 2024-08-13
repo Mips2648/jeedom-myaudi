@@ -1,7 +1,14 @@
 {
 	"id": "myaudi",
 	"name": "My Audi",
-	"description": "Plugin permettant la connexion à My Audi connect",
+	"description": {
+		"fr_FR": "Plugin permettant la connexion à My Audi connect",
+		"en_US": "Plugin for connection to My Audi connect",
+		"es_ES": "Plugin de conexión a My Audi connect",
+		"de_DE": "Plugin, das die Verbindung zu My Audi connect ermöglicht",
+		"it_IT": "Plugin per la connessione a My Audi connect",
+		"pt_PT": "Plugin para ligação ao My Audi connect"
+	},
 	"utilization": "",
 	"licence": "AGPL",
 	"author": "Mips",
@@ -19,8 +26,12 @@
 		"video": ""
 	},
 	"language": [
+		"de_DE",
+		"en_US",
+		"es_ES",
 		"fr_FR",
-		"en_US"
+		"it_IT",
+		"pt_PT"
 	],
 	"compatibility": [
 		"smart",
