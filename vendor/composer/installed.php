@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '1a14ed658d0591fa24ac6c8c4201a152073da883',
+    'reference' => 'e14bed89140e12136942f3949f609915a26576c8',
     'name' => 'mips/jeedom-myaudi',
   ),
   'versions' => 
@@ -18,16 +18,16 @@
       'aliases' => 
       array (
       ),
-      'reference' => '1a14ed658d0591fa24ac6c8c4201a152073da883',
+      'reference' => 'e14bed89140e12136942f3949f609915a26576c8',
     ),
     'mips/jeedom-tools' => 
     array (
-      'pretty_version' => 'v0.23',
-      'version' => '0.23.0.0',
+      'pretty_version' => 'v1.0',
+      'version' => '1.0.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'cc1805a0953ce58415f9e828cd2defacc1bf362d',
+      'reference' => '047aa5ca7831394566a6974ea7ccc882c04025c8',
     ),
   ),
 );
