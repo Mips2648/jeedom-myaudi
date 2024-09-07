@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'e14bed89140e12136942f3949f609915a26576c8',
+    'reference' => '4164ddb414bfe38ca3b96957680ece670d1edf21',
     'name' => 'mips/jeedom-myaudi',
   ),
   'versions' => 
@@ -41,7 +41,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'e14bed89140e12136942f3949f609915a26576c8',
+      'reference' => '4164ddb414bfe38ca3b96957680ece670d1edf21',
     ),
     'mips/jeedom-tools' => 
     array (

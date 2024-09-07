@@ -159,19 +159,11 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{CSID}}</label>
-                                <div class="col-sm-6">
-                                    <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="csid"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Modèle}}</label>
                                 <div class="col-sm-6">
                                     <span type="text" class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="model"></span>
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Année}}</label>
                                 <div class="col-sm-6">

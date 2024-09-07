@@ -32,19 +32,9 @@ try {
         die();
     }
 
+    log::add('myaudi', 'debug', 'message received from daemon: ' . json_encode($result));
     if (isset($result['vehicle'])) {
-        myaudi::syncVehicle($result);
-    } elseif (isset($result['vehicleData'])) {
-        $eqLogic = eqLogic::byLogicalId($result['vehicleData'], 'myaudi');
-        if (!is_object($eqLogic)) {
-            log::add('myaudi', 'warning', "Unknown vehicle received {$result['vehicleData']}");
-        }
-        $eqLogic->updateVehicleData($result);
-    } else {
-        log::add('myaudi', 'error', 'unknown message received from daemon');
-        foreach ($result as $key => $value) {
-            log::add('myaudi', 'debug', "{$key}:{$value}");
-        }
+        myaudi::syncVehicles($result['vehicle']);
     }
 } catch (Exception $e) {
     log::add('myaudi', 'error', displayException($e));

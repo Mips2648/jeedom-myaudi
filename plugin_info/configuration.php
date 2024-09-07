@@ -62,13 +62,6 @@ if (!isConnect()) {
                 </select>
             </div>
         </div>
-        <legend><i class="fas fa-university"></i> {{Options}}</legend>
-        <div class="form-group">
-            <label class="col-sm-4 control-label">{{Clé API Google Maps}}</label>
-            <div class="col-sm-4">
-                <input class="configKey form-control" data-l1key="googleMapsAPIKey" />
-            </div>
-        </div>
         <legend><i class="fas fa-university"></i> {{Démon}}</legend>
         <div class="form-group">
             <label class="col-sm-4 control-label">{{Port socket interne}}</label>

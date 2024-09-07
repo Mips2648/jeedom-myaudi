@@ -22,19 +22,34 @@ function myaudi_install() {
     $pluginId = 'myaudi';
     config::save('api', config::genKey(), $pluginId);
     config::save("api::{$pluginId}::mode", 'localhost');
+    config::save("api::{$pluginId}::restricted", 1);
 }
 
 function myaudi_update() {
     $pluginId = 'myaudi';
     config::save('api', config::genKey(), $pluginId);
     config::save("api::{$pluginId}::mode", 'localhost');
+    config::save("api::{$pluginId}::restricted", 1);
+
+    unlink(__DIR__ . '/packages.json');
+
+    foreach (eqLogic::byType($pluginId) as $eqLogic) {
+        if ($eqLogic->getConfiguration('csid') != '') {
+            $eqLogic->remove();
+        }
+    }
 
     message::removeAll($pluginId, 'checkDependency');
     $dependencyInfo = myaudi::dependancy_info();
     if (!isset($dependencyInfo['state'])) {
         message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__), '', 'checkDependency');
     } elseif ($dependencyInfo['state'] == 'nok') {
-        message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__), '', 'checkDependency');
+        try {
+            $plugin = plugin::byId($pluginId);
+            $plugin->dependancy_install();
+        } catch (\Throwable $th) {
+            message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__));
+        }
     }
 }
 
@@ -42,4 +57,5 @@ function myaudi_remove() {
     $pluginId = 'myaudi';
     config::remove('api', $pluginId);
     config::remove("api::{$pluginId}::mode");
+    config::remove("api::{$pluginId}::restricted");
 }

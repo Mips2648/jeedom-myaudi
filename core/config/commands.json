@@ -6,9 +6,7 @@
             "type": "action",
             "subtype": "other",
             "isVisible": 1
-        }
-    ],
-    "status": [
+        },
         {
             "logicalId": "lock",
             "name": "{{Verrouiller}}",
@@ -22,154 +20,11 @@
             "type": "action",
             "subtype": "other",
             "isVisible": 1
-        },
+        }
+    ],
+    "fuel_status": [
         {
-            "logicalId": "UTC_TIME_AND_KILOMETER_STATUS",
-            "name": "{{Kilométrage}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "km",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "MAINTENANCE_INTERVAL_DISTANCE_TO_OIL_CHANGE",
-            "name": "{{Prochaine vidange huile (km)}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "km",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "MAINTENANCE_INTERVAL_TIME_TO_OIL_CHANGE",
-            "name": "{{Prochaine vidange huile (jours)}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "jours",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "MAINTENANCE_INTERVAL_DISTANCE_TO_INSPECTION",
-            "name": "{{Prochain entretien (km)}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "km",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "MAINTENANCE_INTERVAL_TIME_TO_INSPECTION",
-            "name": "{{Prochain entretien (jours)}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "jours",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "TEMPERATURE_OUTSIDE",
-            "name": "{{Température extérieur}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 1,
-            "unite": "°C",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "WARNING_OIL_CHANGE",
-            "name": "{{Avertissement changement huile}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OIL_LEVEL_AMOUNT_IN_LITERS",
-            "name": "{{Niveau huile}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "l",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OIL_LEVEL_MINIMUM_WARNING",
-            "name": "{{Avertissement niveau huile}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OIL_LEVEL_DIPSTICKS_PERCENTAGE",
-            "name": "{{Pourcentage niveau huile}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "%",
-            "configuration": {
-                "minValue": 0,
-                "maxValue": 100
-            },
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "ADBLUE_RANGE",
-            "name": "{{Autonomie AdBlue}}",
-            "type": "info",
-            "subtype": "numeric",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "unite": "km",
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "TOTAL_RANGE",
+            "logicalId": "total_range_km",
             "name": "{{Autonomie totale}}",
             "type": "info",
             "subtype": "numeric",
@@ -182,8 +37,16 @@
             }
         },
         {
-            "logicalId": "TANK_LEVEL_IN_PERCENTAGE",
-            "name": "{{Pourcentage niveau réservoir}}",
+            "logicalId": "primary_engine_type",
+            "name": "{{Moteur principale}}",
+            "type": "info",
+            "subtype": "string",
+            "isVisible": 0,
+            "isHistorized": 0
+        },
+        {
+            "logicalId": "primary_engine_current_soc_pct",
+            "name": "{{Pourcentage réserve principale}}",
             "type": "info",
             "subtype": "numeric",
             "isVisible": 1,
@@ -199,232 +62,145 @@
             }
         },
         {
-            "logicalId": "LOCK_STATE_LEFT_FRONT_DOOR",
-            "name": "{{Porte avant gauche verrouillée}}",
+            "logicalId": "primary_engine_remaining_range_km",
+            "name": "{{Autonomie moteur principale}}",
             "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "LOCK_STATE_LEFT_REAR_DOOR",
-            "name": "{{Porte arrière gauche verrouillée}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "LOCK_STATE_RIGHT_FRONT_DOOR",
-            "name": "{{Porte avant droite verrouillée}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "LOCK_STATE_RIGHT_REAR_DOOR",
-            "name": "{{Porte arrière droite verrouillée}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "LOCK_STATE_VEHICLE",
-            "name": "{{Véhicule verrouillé}}",
-            "type": "info",
-            "subtype": "binary",
+            "subtype": "numeric",
             "isVisible": 1,
             "isHistorized": 0,
+            "unite": "km",
             "template": {
                 "dashboard": "line",
                 "mobile": "line"
             }
         },
         {
-            "logicalId": "OPEN_STATE_LEFT_FRONT_DOOR",
-            "name": "{{Porte avant gauche fermée}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OPEN_STATE_LEFT_REAR_DOOR",
-            "name": "{{Porte arrière gauche fermée}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OPEN_STATE_RIGHT_FRONT_DOOR",
-            "name": "{{Porte avant droite fermée}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OPEN_STATE_RIGHT_REAR_DOOR",
-            "name": "{{Porte arrière droite fermée}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OPEN_STATE_VEHICLE",
-            "name": "{{Portes fermées}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "LOCK_STATE_TRUNK_LID",
-            "name": "{{Hayon verouillé}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 0,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        },
-        {
-            "logicalId": "OPEN_STATE_TRUNK_LID",
-            "name": "{{Hayon fermé}}",
-            "type": "info",
-            "subtype": "binary",
-            "isVisible": 1,
-            "isHistorized": 0,
-            "template": {
-                "dashboard": "line",
-                "mobile": "line"
-            }
-        }
-    ],
-    "charger": [
-        {
-            "logicalId": "charger_start",
-            "name": "{{Démarrer le chargeur}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "charger_stop",
-            "name": "{{Arrêter le chargeur}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        }
-    ],
-    "climatisation": [
-        {
-            "logicalId": "ac_start",
-            "name": "{{Démarrer la climatisation}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        },
-        {
-            "logicalId": "ac_stop",
-            "name": "{{Arrêter la climatisation}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
-        }
-    ],
-    "position": [
-        {
-            "logicalId": "LOCATION",
-            "name": "{{Localisation}}",
+            "logicalId": "secondary_engine_type",
+            "name": "{{Moteur secondaire}}",
             "type": "info",
             "subtype": "string",
+            "isVisible": 0,
+            "isHistorized": 0
+        },
+        {
+            "logicalId": "secondary_engine_current_soc_pct",
+            "name": "{{Pourcentage réserve secondaire}}",
+            "type": "info",
+            "subtype": "numeric",
             "isVisible": 1,
             "isHistorized": 0,
+            "unite": "%",
+            "configuration": {
+                "minValue": 0,
+                "maxValue": 100
+            },
             "template": {
                 "dashboard": "line",
                 "mobile": "line"
-            },
-            "display": {
-                "parameters": {
-                    "showMap": 1,
-                    "mapWidth": 240,
-                    "mapHeight": 180,
-                    "showCoordinates": 0
-                }
+            }
+        },
+        {
+            "logicalId": "secondary_engine_remaining_range_km",
+            "name": "{{Autonomie moteur secondaire}}",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard": "line",
+                "mobile": "line"
             }
         }
     ],
-    "preheater": [
+    "charging": [
         {
-            "logicalId": "preheater_start",
-            "name": "{{Démarrer le préchauffage}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
+            "logicalId": "charging_state",
+            "name": "{{Etat charge}}",
+            "type": "info",
+            "subtype": "binary",
+            "isVisible": 1,
+            "isHistorized": 0
         },
         {
-            "logicalId": "preheater_stop",
-            "name": "{{Arrêter le préchauffage}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
+            "logicalId": "charge_power_kw",
+            "name": "{{Puissance charge}}",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "kw",
+            "template": {
+                "dashboard": "line",
+                "mobile": "line"
+            }
+        }
+    ],
+    "vehicle_health_inspection": [
+        {
+            "logicalId": "inspection_due_days",
+            "name": "{{Entretien (jours)}}",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "j",
+            "template": {
+                "dashboard": "line",
+                "mobile": "line"
+            }
         },
         {
-            "logicalId": "defrost_start",
-            "name": "{{Démarrer le dégivrage}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
+            "logicalId": "inspection_due_km",
+            "name": "{{Entretien (km)}}",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard": "line",
+                "mobile": "line"
+            }
         },
         {
-            "logicalId": "defrost__stop",
-            "name": "{{Arrêter le dégivrage}}",
-            "type": "action",
-            "subtype": "other",
-            "isVisible": 1
+            "logicalId": "mileage_km",
+            "name": "{{Kilométrage}}",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard": "line",
+                "mobile": "line"
+            }
+        },
+        {
+            "logicalId": "oil_service_due_days",
+            "name": "{{Huile (jours)}}",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "unite": "j",
+            "template": {
+                "dashboard": "line",
+                "mobile": "line"
+            }
+        },
+        {
+            "logicalId": "oil_service_due_km",
+            "name": "{{Huile (km)}}",
+            "type": "info",
+            "subtype": "numeric",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "unite": "km",
+            "template": {
+                "dashboard": "line",
+                "mobile": "line"
+            }
         }
     ]
 }
