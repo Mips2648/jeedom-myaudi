@@ -27,25 +27,37 @@ if (!isConnect()) {
         <legend><i class="fas fa-user-cog"></i> {{Authentification}}</legend>
         <div class="form-group">
             <label class="col-sm-4 control-label">{{Nom d'utilisateur}}</label>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <input type="text" class="configKey form-control" data-l1key="user" placeholder="{{Saisir le nom d'utilisateur}}" />
             </div>
         </div>
         <div class="form-group">
+
             <label class="col-sm-4 control-label">{{Mot de passe}}</label>
-            <div class="col-sm-4">
-                <input type="password" class="configKey form-control" data-l1key="password" placeholder="{{Saisir le mot de passe}}" />
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <input type="text" class="configKey form-control roundedLeft inputPassword" data-l1key="password" placeholder="{{Saisir le mot de passe}}" />
+                    <span class="input-group-btn">
+                        <a class="btn btn-default form-control bt_showPass roundedRight"><i class="fas fa-eye"></i></a>
+                    </span>
+                </div>
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-4 control-label">{{S-PIN}}</label>
-            <div class="col-sm-4">
-                <input type="password" class="configKey form-control" data-l1key="spin" placeholder="{{Saisir le S-PIN}}" />
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <input type="text" class="configKey form-control roundedLeft inputPassword" data-l1key="spin" placeholder="{{Saisir le S-PIN}}" />
+                    <span class="input-group-btn">
+                        <a class="btn btn-default form-control bt_showPass roundedRight"><i class="fas fa-eye"></i></a>
+                    </span>
+                </div>
+
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-4 control-label">{{Pays}}</label>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <select class="configKey form-control" data-l1key="country">
                     <option value="" disabled="">{{Sélectionner votre pays}}</option>
                     <option value="BE">{{Belgique}}</option>
