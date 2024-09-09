@@ -49,6 +49,7 @@ class MyAudiDaemon(BaseDaemon):
     async def on_message(self, message: list):
         vehicle = [v for v in self._api.vehicles if v.vin == message['vin']].pop()
         if message['action'] == 'lock':
+            vehicle.api_level['lock'] = 1
             await vehicle.async_set_lock(True)
         elif message['action'] == 'unlock':
             await vehicle.async_set_lock(False)
@@ -67,7 +68,6 @@ class MyAudiDaemon(BaseDaemon):
                         self._logger.info("Connected to MyAudi API")
                         try:
                             for vehicle in self._api.vehicles:
-                                self._logger.info(type(vehicle.infos))
                                 data = {
                                     "vin": vehicle.vin,
                                     "infos": vehicle.infos,
