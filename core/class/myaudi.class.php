@@ -214,15 +214,13 @@ class myaudi extends eqLogic {
 	}
 
 	public function postInsert() {
+	}
+
+	public function postSave() {
 		$commands = self::getCommandsFileContent(__DIR__ . '/../config/commands.json');
 		$this->createCommandsFromConfig($commands['vehicle']);
 		$this->createCommandsFromConfig($commands['fuel_status']);
 		$this->createCommandsFromConfig($commands['vehicle_health_inspection']);
-	}
-
-	public function postSave() {
-		$this->refreshWidget();
-		$this->createCommandsFromConfigFile(__DIR__ . '/../config/commands.json', 'vehicle');
 	}
 
 	public function refresh() {
