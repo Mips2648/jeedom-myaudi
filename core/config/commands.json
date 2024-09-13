@@ -20,6 +20,34 @@
             "type": "action",
             "subtype": "other",
             "isVisible": 1
+        },
+        {
+            "logicalId": "climatisation_on",
+            "name": "{{climatisation on}}",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "climatisation_off",
+            "name": "{{climatisation off}}",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "window_heating_on",
+            "name": "{{window_heating on}}",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
+        },
+        {
+            "logicalId": "window_heating_off",
+            "name": "{{window_heating off}}",
+            "type": "action",
+            "subtype": "other",
+            "isVisible": 1
         }
     ],
     "fuel_status": [

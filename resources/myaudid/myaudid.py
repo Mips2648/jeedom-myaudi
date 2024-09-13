@@ -53,6 +53,14 @@ class MyAudiDaemon(BaseDaemon):
             await vehicle.async_set_lock(True)
         elif message['action'] == 'unlock':
             await vehicle.async_set_lock(False)
+        elif message['action'] == 'climatisation_on':
+            await vehicle.async_set_climatisation(True)
+        elif message['action'] == 'climatisation_off':
+            await vehicle.async_set_climatisation(False)
+        elif message['action'] == 'window_heating_on':
+            await vehicle.async_set_window_heating(True)
+        elif message['action'] == 'window_heating_off':
+            await vehicle.async_set_window_heating(False)
 
     async def __update_task(self):
         try:
