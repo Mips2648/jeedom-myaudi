@@ -28,7 +28,11 @@
         "Pourcentage réserve secondaire": "Porcentaje de reserva secundaria",
         "Puissance charge": "Carga eléctrica",
         "Rafraichir": "Refrescar",
-        "Verrouiller": "Cerrar"
+        "Verrouiller": "Cerrar",
+        "climatisation off": "aire acondicionado apagado",
+        "climatisation on": "aire acondicionado encendido",
+        "window_heating off": "calefaccion_ventanas apagada",
+        "window_heating on": "calefaccion_ventanas encendida"
     },
     "plugins\/myaudi\/core\/php\/jeeMyAudi.php": {
         "Vous n\\'etes pas autorisé à effectuer cette action": "No está autorizado a realizar esta acción"
