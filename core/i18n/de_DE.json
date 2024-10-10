@@ -15,7 +15,6 @@
         "Autonomie moteur principale": "Autonomie Hauptmotor",
         "Autonomie moteur secondaire": "Autonomie sekundärer Motor",
         "Autonomie totale": "Volle Autonomie",
-        "Déverrouiller": "Entsperren",
         "Entretien (jours)": "Wartung (Tage)",
         "Entretien (km)": "Wartung (km)",
         "Etat charge": "Ladestatus",
@@ -27,12 +26,7 @@
         "Pourcentage réserve principale": "Prozentsatz Hauptreserve",
         "Pourcentage réserve secondaire": "Prozentualer Anteil Sekundärreserve",
         "Puissance charge": "Leistung Aufladen",
-        "Rafraichir": "Auffrischen",
-        "Verrouiller": "Schloss",
-        "climatisation off": "klimaanlage aus",
-        "climatisation on": "klimaanlage ein",
-        "window_heating off": "window_heating off",
-        "window_heating on": "window_heating on"
+        "Rafraichir": "Auffrischen"
     },
     "plugins\/myaudi\/core\/php\/jeeMyAudi.php": {
         "Vous n\\'etes pas autorisé à effectuer cette action": "Sie sind nicht berechtigt, diese Aktion durchzuführen"
