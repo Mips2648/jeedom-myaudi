@@ -28,7 +28,11 @@
         "Pourcentage réserve secondaire": "Percentuale di riserva secondaria",
         "Puissance charge": "Carico di energia",
         "Rafraichir": "Aggiorna",
-        "Verrouiller": "Blocco"
+        "Verrouiller": "Blocco",
+        "climatisation off": "aria condizionata spenta",
+        "climatisation on": "aria condizionata accesa",
+        "window_heating off": "riscaldamento_finestre spento",
+        "window_heating on": "riscaldamento_finestre acceso"
     },
     "plugins\/myaudi\/core\/php\/jeeMyAudi.php": {
         "Vous n\\'etes pas autorisé à effectuer cette action": "Non siete autorizzati ad eseguire questa azione"

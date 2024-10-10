@@ -28,7 +28,11 @@
         "Pourcentage réserve secondaire": "Secondary reserve percentage",
         "Puissance charge": "Power load",
         "Rafraichir": "Refresh",
-        "Verrouiller": "Lock"
+        "Verrouiller": "Lock",
+        "climatisation off": "air conditioning off",
+        "climatisation on": "air conditioning on",
+        "window_heating off": "window_heating off",
+        "window_heating on": "window_heating on"
     },
     "plugins\/myaudi\/core\/php\/jeeMyAudi.php": {
         "Vous n\\'etes pas autorisé à effectuer cette action": "You are not authorized to perform this action"
