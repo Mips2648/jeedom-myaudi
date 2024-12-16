@@ -5,7 +5,6 @@
         "Audi eqLogic non trouvé: ": "Audi eqLogic not found:"
     },
     "plugins\/myaudi\/core\/class\/myaudi.class.php": {
-        "Expression cron non valide: ": "Invalid cron expression:",
         "Impossible de lancer le démon MyAudi, vérifiez le log": "Unable to start MyAudi daemon, check log",
         "Le mot de passe n\\'est pas configuré": "Password not set",
         "Le nom d\\'utilisateur n\\'est pas configuré": "User name not configured",
@@ -53,9 +52,7 @@
         "Année": "Year",
         "Aucun": "None",
         "Aucun équipement trouvé, cliquer sur \"Synchroniser\" pour commencer": "No equipment found, click on \"Synchronize\" to begin",
-        "Auto-actualisation": "Self-actualization",
         "Catégorie": "Category",
-        "Cliquer sur ? pour afficher l'assistant cron": "Click on ? to display the cron wizard",
         "Commandes": "Commands",
         "Configuration": "Configuration",
         "Configuration avancée": "Advanced configuration",
@@ -64,7 +61,6 @@
         "Equipement non visible": "Equipment not visible",
         "Equipement visible": "Visible equipment",
         "Etat": "State",
-        "Fréquence de rafraîchissement des commandes infos de l'équipement": "Equipment info command refresh rate",
         "Gestion": "Management",
         "Informations": "Information",
         "Mes Véhicules": "My vehicles",
@@ -74,7 +70,6 @@
         "Objet parent": "Parent object",
         "Options": "Options",
         "Paramètres généraux": "General settings",
-        "Paramètres spécifiques": "Specific parameters",
         "Rechercher": "Search",
         "Sauvegarder": "Save",
         "Supprimer": "Delete",
