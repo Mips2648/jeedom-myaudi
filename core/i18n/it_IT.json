@@ -5,7 +5,6 @@
         "Audi eqLogic non trouvé: ": "Audi eqLogic non trovato:"
     },
     "plugins\/myaudi\/core\/class\/myaudi.class.php": {
-        "Expression cron non valide: ": "Espressione cron non valida:",
         "Impossible de lancer le démon MyAudi, vérifiez le log": "Impossibile avviare il demone MyAudi, controllare il registro",
         "Le mot de passe n\\'est pas configuré": "La password non è configurata",
         "Le nom d\\'utilisateur n\\'est pas configuré": "Il nome utente non è configurato",
@@ -53,9 +52,7 @@
         "Année": "Anno",
         "Aucun": "Nessuno",
         "Aucun équipement trouvé, cliquer sur \"Synchroniser\" pour commencer": "Nessuna apparecchiatura trovata, fare clic su \"Sincronizza\" per iniziare",
-        "Auto-actualisation": "Aggiornamento automatico",
         "Catégorie": "Categoria",
-        "Cliquer sur ? pour afficher l'assistant cron": "Fare clic su ? per visualizzare la procedura guidata di cron",
         "Commandes": "Comandi",
         "Configuration": "Configurazione",
         "Configuration avancée": "Configurazione avanzata",
@@ -64,7 +61,6 @@
         "Equipement non visible": "Apparecchiature non visibili",
         "Equipement visible": "Apparecchiature visibili",
         "Etat": "Stato",
-        "Fréquence de rafraîchissement des commandes infos de l'équipement": "Frequenza di aggiornamento dei comandi di informazione sulle apparecchiature",
         "Gestion": "Gestione",
         "Informations": "Informazioni",
         "Mes Véhicules": "I miei veicoli",
@@ -74,7 +70,6 @@
         "Objet parent": "Oggetto padre",
         "Options": "Opzioni",
         "Paramètres généraux": "Parametri generali",
-        "Paramètres spécifiques": "Parametri specifici",
         "Rechercher": "Ricercare",
         "Sauvegarder": "Sauvegarder",
         "Supprimer": "Supprimer",
