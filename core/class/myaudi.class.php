@@ -137,7 +137,7 @@ class myaudi extends eqLogic {
 			}
 			try {
 				if ($cronIsDue) {
-					$eqLogic->refresh();
+					$eqLogic->refreshVehicle();
 				}
 			} catch (\Throwable $th) {
 				log::add(__CLASS__, 'debug', $th->getMessage());
@@ -223,7 +223,7 @@ class myaudi extends eqLogic {
 		$this->createCommandsFromConfig($commands['vehicle_health_inspection']);
 	}
 
-	public function refresh() {
+	public function refreshVehicle() {
 		$params = array('method' => 'getVehicleData', 'vin' => $this->getLogicalId());
 		myaudi::sendToDaemon($params);
 	}
@@ -256,7 +256,7 @@ class myaudiCmd extends cmd {
 
 		switch ($this->getLogicalId()) {
 			case 'refresh':
-				$eqlogic->refresh();
+				$eqlogic->refreshVehicle();
 				break;
 			default:
 				$eqlogic->execute_vehicle_action($this->getLogicalId());
