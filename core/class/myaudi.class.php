@@ -124,27 +124,6 @@ class myaudi extends eqLogic {
 		sleep(1);
 	}
 
-	public static function cron() {
-		foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
-			$autorefresh = $eqLogic->getConfiguration('autorefresh', '');
-			$cronIsDue = false;
-			if ($autorefresh == '')  continue;
-			try {
-				$cron = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
-				$cronIsDue = $cron->isDue();
-			} catch (Exception $e) {
-				log::add(__CLASS__, 'error', __('Expression cron non valide: ', __FILE__) . $autorefresh);
-			}
-			try {
-				if ($cronIsDue) {
-					$eqLogic->refreshVehicle();
-				}
-			} catch (\Throwable $th) {
-				log::add(__CLASS__, 'debug', $th->getMessage());
-			}
-		}
-	}
-
 	public static function syncVehicles(array $vehicles) {
 		foreach ($vehicles as $vin => $vehicle) {
 			/** @var myaudi */
@@ -213,130 +192,13 @@ class myaudi extends eqLogic {
 		}
 	}
 
-	public function postInsert() {
-	}
-
 	public function postSave() {
 		$commands = self::getCommandsFileContent(__DIR__ . '/../config/commands.json');
-		$this->createCommandsFromConfig($commands['vehicle']);
+		// $this->createCommandsFromConfig($commands['vehicle']);
 		$this->createCommandsFromConfig($commands['fuel_status']);
 		$this->createCommandsFromConfig($commands['vehicle_health_inspection']);
-	}
-
-	public function refreshVehicle() {
-		$params = array('method' => 'getVehicleData', 'vin' => $this->getLogicalId());
-		myaudi::sendToDaemon($params);
-	}
-
-	public function execute_vehicle_action($action) {
-		$params = array(
-			'action' => $action,
-			'vin' => $this->getLogicalId()
-		);
-		myaudi::sendToDaemon($params);
 	}
 }
 
 class myaudiCmd extends cmd {
-
-	public static $_widgetPossibility = array(
-		'custom' => array(
-			'widget' => false,
-			'visibility' => true,
-			'displayName' => true,
-			'displayIconAndName' => true,
-			'optionalParameters' => true
-		)
-	);
-
-	public function execute($_options = array()) {
-
-		/** @var myaudi */
-		$eqlogic = $this->getEqLogic();
-
-		switch ($this->getLogicalId()) {
-			case 'refresh':
-				$eqlogic->refreshVehicle();
-				break;
-			default:
-				$eqlogic->execute_vehicle_action($this->getLogicalId());
-				break;
-		}
-	}
-
-	private function locationToHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
-		$version2 = jeedom::versionAlias($_version, false);
-		if ($this->getDisplay('showOn' . $version2, 1) == 0) {
-			return '';
-		}
-
-		$hideCoordinates = 'hidden';
-		$showMap = 1;
-		$mapWidth = 240;
-		$mapHeight = 180;
-		$parameters = $this->getDisplay('parameters');
-		if (is_array($parameters)) {
-			if (isset($parameters['showMap'])) {
-				$showMap = $parameters['showMap'];
-			}
-			if (isset($parameters['showCoordinates']) && $parameters['showCoordinates'] == 1) {
-				$hideCoordinates = '';
-			}
-			if (isset($parameters['mapWidth']) && is_numeric($parameters['mapWidth'])) {
-				$mapWidth = $parameters['mapWidth'];
-			}
-			if (isset($parameters['mapHeight']) && is_numeric($parameters['mapHeight'])) {
-				$mapHeight = $parameters['mapHeight'];
-			}
-		}
-
-		if ($showMap == 0) {
-			log::add('myaudi', 'info', "map not active, default widget used");
-			return parent::toHtml($_version, $_options, $_cmdColor);
-		}
-
-		$apiKey = config::byKey('googleMapsAPIKey', 'myaudi');
-		if ($apiKey == '') {
-			log::add('myaudi', 'info', "no google Maps API Key configured, default widget used");
-			return parent::toHtml($_version, $_options, $_cmdColor);
-		}
-
-		log::add('myaudi', 'debug', "hideCoordinates:{$hideCoordinates} - showMap:{$showMap} - mapWidth:{$mapWidth} - mapHeight:{$mapHeight}");
-
-
-
-		$replace = array(
-			'#id#' => $this->getId(),
-			'#name#' => $this->getName(),
-			'#location#' => $this->execCmd(),
-			'#name_display#' => ($this->getDisplay('icon') != '') ? $this->getDisplay('icon') : $this->getName(),
-			'#history#' => ($this->getIsHistorized() == 1) ? 'history cursor' : '',
-			'#logicalId#' => $this->getLogicalId(),
-			'#uid#' => 'cmd' . $this->getId() . eqLogic::UIDDELIMITER . mt_rand() . eqLogic::UIDDELIMITER,
-			'#version#' => $_version,
-			'#eqLogic_id#' => $this->getEqLogic_id(),
-			'#hideCmdName#' => ($this->getDisplay('showNameOn' . $version2, 1) == 0) ? 'display:none;' : '',
-			'#collectDate#' => $this->getCollectDate(),
-			'#valueDate#' => $this->getValueDate(),
-			'#apiKey#' => $apiKey,
-			'#mapsWidth#' => $mapWidth,
-			'#mapsHeight#' => $mapHeight,
-			'#hideCoordinates#' => $hideCoordinates
-		);
-		if ($this->getDisplay('showIconAndName' . $version2, 0) == 1) {
-			$replace['#name_display#'] = $this->getDisplay('icon') . ' ' . $this->getName();
-		}
-
-		$version = jeedom::versionAlias($_version);
-		$template = getTemplate('core', $version, 'locationCmd', 'myaudi');
-
-		return template_replace($replace, $template);
-	}
-
-	public function toHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
-		// if ($this->getLogicalId() == 'LOCATION') {
-		// 	return $this->locationToHtml($_version, $_options, $_cmdColor);
-		// }
-		return parent::toHtml($_version, $_options, $_cmdColor);
-	}
 }

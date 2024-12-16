@@ -50,6 +50,9 @@ function myaudi_update() {
         if ($eqLogic->getConfiguration('csid') != '') {
             $eqLogic->remove();
         }
+        foreach ($eqLogic->getCmd('action', null, null, true) as $cmd) {
+            $cmd->remove();
+        }
     }
 
     message::removeAll($pluginId, 'checkDependency');

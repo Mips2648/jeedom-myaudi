@@ -7,6 +7,7 @@ from jeedomdaemon.base_config import BaseConfig
 
 from audiconnectpy import AudiConnect, AudiException
 
+
 class AudiConfig(BaseConfig):
     def __init__(self):
         super().__init__()
@@ -36,7 +37,7 @@ class AudiConfig(BaseConfig):
 class MyAudiDaemon(BaseDaemon):
     def __init__(self):
         self._config = AudiConfig()
-        super().__init__(self._config, on_start_cb=self.on_start, on_message_cb=self.on_message)
+        super().__init__(self._config, on_start_cb=self.on_start)
 
         logging.getLogger('audiconnectpy').setLevel(logging.WARNING)
         warnings.filterwarnings("ignore")
@@ -45,22 +46,6 @@ class MyAudiDaemon(BaseDaemon):
 
     async def on_start(self):
         asyncio.create_task(self.__update_task())
-
-    async def on_message(self, message: list):
-        vehicle = [v for v in self._api.vehicles if v.vin == message['vin']].pop()
-        if message['action'] == 'lock':
-            vehicle.api_level['lock'] = 1
-            await vehicle.async_set_lock(True)
-        elif message['action'] == 'unlock':
-            await vehicle.async_set_lock(False)
-        elif message['action'] == 'climatisation_on':
-            await vehicle.async_set_climatisation(True)
-        elif message['action'] == 'climatisation_off':
-            await vehicle.async_set_climatisation(False)
-        elif message['action'] == 'window_heating_on':
-            await vehicle.async_set_window_heating(True)
-        elif message['action'] == 'window_heating_off':
-            await vehicle.async_set_window_heating(False)
 
     async def __update_task(self):
         try:
@@ -135,5 +120,6 @@ class MyAudiDaemon(BaseDaemon):
                         asyncio.sleep(120)
         except asyncio.CancelledError:
             self._logger.info("stop auto update")
+
 
 MyAudiDaemon().run()
