@@ -25,9 +25,12 @@ function InstallComposerDependencies() {
     shell_exec($cmd);
 }
 
+function myaudi_post_plugin_install() {
+    InstallComposerDependencies();
+}
+
 function myaudi_install() {
     $pluginId = basename(realpath(__DIR__ . '/..'));
-    InstallComposerDependencies();
 
     config::save('api', config::genKey(), $pluginId);
     config::save("api::{$pluginId}::mode", 'localhost');
@@ -36,7 +39,6 @@ function myaudi_install() {
 
 function myaudi_update() {
     $pluginId = basename(realpath(__DIR__ . '/..'));
-    InstallComposerDependencies();
 
     config::save('api', config::genKey(), $pluginId);
     config::save("api::{$pluginId}::mode", 'localhost');
