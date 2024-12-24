@@ -166,22 +166,64 @@ trait MipsEqLogicTrait {
 		return $return;
 	}
 
+	/**
+	 * Return the package detail from the requirement line if it is a valid requirement line
+	 *
+	 * @param string $requirementLine
+	 * @param string[] $packageDetail if the requirement line is valid, it will contain the following:
+	 * - [0] the full requirement line
+	 * - [1] the package name
+	 * - [2] the operator
+	 * - [3] the version
+	 * @return bool true if the requirement line is valid, false otherwise
+	 */
+	private static function getRequiredPackageDetail(string $requirementLine, &$packageDetail) {
+		// regex explanation to match https://pip.pypa.io/en/stable/reference/requirement-specifiers/:
+		// valid name: https://packaging.python.org/en/latest/specifications/name-normalization/
+		// optional spaces
+		// optional brackets with a set of “extras” that serve to install optional dependencies
+		// optionally constraints to apply on the version of the package which will consist of
+		// - an operator: one of ==, >=, ~=
+		// - a version: a series of digits and dots
+		// optional spaces
+		// end of line or a semicolon or a comma with environment markers
+		return preg_match('/^(?<name>[A-Z0-9]|[A-Z0-9][A-Z0-9._-]*[A-Z0-9])\s*(?:\[.*\])?\s*(?:(?<operator>[>=~]=)\s*(?<version>[\d+\.?]+))?\s*(?:$|;.*|,.*)/i', $requirementLine, $packageDetail) === 1;
+	}
+
+	/**
+	 * Return the installed package detail from the installed packages list if it exists
+	 *
+	 * @param string $packageName
+	 * @param array $installedPackages the list of installed packages
+	 * @param string[] $packageDetail if the package is installed, it will contain the following:
+	 * - [0] 'package==version'
+	 * - [1] the version
+	 * @return bool true if the package is installed, false otherwise
+	 */
+	private static function getInstalledPackageDetail(string $packageName, array $installedPackages, &$packageDetail) {
+		$packages = "||" . join("||", $installedPackages);
+		return preg_match('/\|\|\K' . $packageName . '==([\d+\.?]+)/i', $packages, $packageDetail) === 1;
+	}
+
 	private static function pythonRequirementsInstalled(string $pythonPath, string $requirementsPath) {
 		if (!file_exists($pythonPath) || !file_exists($requirementsPath)) {
 			return false;
 		}
 		exec("{$pythonPath} -m pip freeze", $packages_installed);
-		$packages = join("||", $packages_installed);
-		exec("cat {$requirementsPath}", $packages_needed);
-		foreach ($packages_needed as $line) {
-			if (preg_match('/([^\s]+)[\s]*([>=~]=)[\s]*([\d+\.?]+)$/', $line, $need) === 1) {
-				if (preg_match('/' . $need[1] . '==([\d+\.?]+)/', $packages, $install) === 1) {
-					if ($need[2] == '==' && $need[3] != $install[1]) {
+		exec("cat {$requirementsPath}", $requirements);
+
+		foreach ($requirements as $requirement_line) {
+			if (self::getRequiredPackageDetail($requirement_line, $package_details)) {
+				if (self::getInstalledPackageDetail($package_details['name'], $packages_installed, $install)) {
+					if ($package_details['operator'] == '==' && $package_details['version'] != $install[1]) {
+						log::add(__CLASS__, 'debug', "Package {$package_details['name']} version is {$install[1]} but version {$package_details['version']} is required");
 						return false;
-					} elseif (version_compare($need[3], $install[1], '>')) {
+					} elseif (version_compare($package_details['version'], $install[1], '>')) {
+						log::add(__CLASS__, 'debug', "Package {$package_details['name']} version is {$install[1]} but version at least {$package_details['version']} is required");
 						return false;
 					}
 				} else {
+					log::add(__CLASS__, 'debug', "Package {$package_details['name']} seems not installed");
 					return false;
 				}
 			}

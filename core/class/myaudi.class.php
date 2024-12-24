@@ -23,18 +23,31 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 class myaudi extends eqLogic {
 	use MipsEqLogicTrait;
 
-	public static $_encryptConfigKey = array('user', 'password', 'spin', 'googleMapsAPIKey');
+	const PYTHON_PATH = __DIR__ . '/../../resources/venv/bin/python3';
+
+	public static $_encryptConfigKey = array('user', 'password', 'spin');
 
 	protected static function getSocketPort() {
 		return config::byKey('socketport', __CLASS__, 55066);;
 	}
 
-	private static function getPython3() {
-		// TODO: to be remove when core min version is >= 4.4.7, then we can directly use system::getCmdPython3(__CLASS__)
-		if (method_exists('system', 'getCmdPython3')) {
-			return system::getCmdPython3(__CLASS__);
+	public static function dependancy_install() {
+		log::remove(__CLASS__ . '_update');
+		return array('script' => __DIR__ . '/../../resources/install_#stype#.sh', 'log' => log::getPathToLog(__CLASS__ . '_update'));
+	}
+
+	public static function dependancy_info() {
+		$return = array();
+		$return['log'] = log::getPathToLog(__CLASS__ . '_update');
+		$return['progress_file'] = jeedom::getTmpFolder(__CLASS__) . '/dependance';
+		$return['state'] = 'ok';
+		if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependance')) {
+			$return['state'] = 'in_progress';
+		} elseif (!self::pythonRequirementsInstalled(self::PYTHON_PATH, __DIR__ . '/../../resources/requirements.txt')) {
+			log::add(__CLASS__, 'debug', 'pythonRequirementsInstalled nok');
+			$return['state'] = 'nok';
 		}
-		return 'python3 ';
+		return $return;
 	}
 
 	public static function deamon_info() {
@@ -70,13 +83,13 @@ class myaudi extends eqLogic {
 			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
 		}
 
-		$path = realpath(__DIR__ . '/../../resources/myaudid/myaudid.py');
-		$cmd = 'sudo ' . self::getPython3() . $path;
+		$path = realpath(__DIR__ . '/../../resources/myaudid');
+		$cmd = self::PYTHON_PATH . " {$path}/myaudid.py";
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
 		$cmd .= ' --socketport ' . self::getSocketPort();
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/myaudi/core/php/jeeMyAudi.php';
-		$cmd .= ' --user "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"';
-		$cmd .= ' --pswd "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"';
+		$cmd .= ' --username "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"';
+		$cmd .= ' --password "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"';
 		$cmd .= ' --spin "' . trim(str_replace('"', '\"', config::byKey('spin', __CLASS__))) . '"';
 		$cmd .= ' --country ' . config::byKey('country', __CLASS__, 'DE');
 		$cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
@@ -111,272 +124,81 @@ class myaudi extends eqLogic {
 		sleep(1);
 	}
 
-	public static function cron() {
-		foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
-			$autorefresh = $eqLogic->getConfiguration('autorefresh', '');
-			$cronIsDue = false;
-			if ($autorefresh == '')  continue;
-			try {
-				$cron = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
-				$cronIsDue = $cron->isDue();
-			} catch (Exception $e) {
-				log::add(__CLASS__, 'error', __('Expression cron non valide: ', __FILE__) . $autorefresh);
+	public static function syncVehicles(array $vehicles) {
+		foreach ($vehicles as $vin => $vehicle) {
+			/** @var myaudi */
+			$eqLogic = eqLogic::byLogicalId($vin, __CLASS__);
+			if (!is_object($eqLogic)) {
+				log::add(__CLASS__, 'info', "Creating new vehicle with vin='{$vin}'");
+				$eqLogic = new self();
+				$eqLogic->setLogicalId($vin);
+				$eqLogic->setName($vehicle['infos']['media']['short_name']);
+				$eqLogic->setEqType_name(__CLASS__);
+				$eqLogic->setIsEnable(1);
+				$eqLogic->setConfiguration('model_year', $vehicle['infos']['core']['model_year']);
+				$eqLogic->setConfiguration('model', $vehicle['infos']['media']['long_name']);
+				$eqLogic->save();
 			}
-			try {
-				if ($cronIsDue) {
-					$eqLogic->refresh();
-				}
-			} catch (\Throwable $th) {
-				log::add(__CLASS__, 'debug', $th->getMessage());
-			}
+			$eqLogic->updateVehicleData($vehicle);
 		}
 	}
 
-	public static function syncVehicle($vehicle) {
-		/** @var myaudi */
-		$eqLogic = eqLogic::byLogicalId($vehicle['vehicle'], __CLASS__);
-		if (!is_object($eqLogic)) {
-			log::add(__CLASS__, 'info', 'Creating new vehicle with vin="' . $vehicle['vehicle'] . '" and csid="' . $vehicle['csid'] . '"');
-			$eqLogic = new self();
-			$eqLogic->setLogicalId($vehicle['vehicle']);
-			$eqLogic->setName($vehicle['title'] . '_' . $vehicle['vehicle']);
-			$eqLogic->setEqType_name(__CLASS__);
-			$eqLogic->setIsEnable(1);
+	public function updateVehicleData(array $vehicle) {
+		if (isset($vehicle['fuel_status'])) {
+			$this->updateFuelStatus($vehicle['fuel_status']);
 		}
-		$eqLogic->setConfiguration('csid', $vehicle['csid']);
-		$eqLogic->setConfiguration('model_year', $vehicle['model_year']);
-		$eqLogic->setConfiguration('model_family', $vehicle['model_family']);
-		$eqLogic->setConfiguration('model', $vehicle['model']);
-		$eqLogic->save();
-
-		$commandsConfig = $eqLogic->getCommandsFileContent(__DIR__ . '/../config/commands.json');
-		$eqLogic->createCommandsFromConfig($commandsConfig['vehicle']);
-		if ($vehicle['support_status_report']) $eqLogic->createCommandsFromConfig($commandsConfig['status']);
-		if ($vehicle['support_ac']) $eqLogic->createCommandsFromConfig($commandsConfig['climatisation']);
-		if ($vehicle['support_position']) $eqLogic->createCommandsFromConfig($commandsConfig['position']);
-		if ($vehicle['support_preheater']) $eqLogic->createCommandsFromConfig($commandsConfig['preheater']);
-		if ($vehicle['support_charger']) $eqLogic->createCommandsFromConfig($commandsConfig['charger']);
-		$eqLogic->updateVehicleData($vehicle);
+		if (isset($vehicle['charging'])) {
+			$this->updateCharging($vehicle['charging']);
+		}
+		if (isset($vehicle['vehicle_health_inspection'])) {
+			$this->updateVehicleHealthInspection($vehicle['vehicle_health_inspection']);
+		}
 	}
 
-	public function updateVehicleData($vehicle) {
-		$vehicleLockState = 1;
-		$vehicleOpenState = 1;
-		foreach ($vehicle['data'] as $key => $value) {
-			switch ($key) {
-				case 'TEMPERATURE_OUTSIDE':
-					$celcius = ($value / 10) - 273.15;
-					$this->checkAndUpdateCmd($key, $celcius);
-					break;
-				case 'MAINTENANCE_INTERVAL_DISTANCE_TO_OIL_CHANGE':
-				case 'MAINTENANCE_INTERVAL_TIME_TO_OIL_CHANGE':
-				case 'MAINTENANCE_INTERVAL_DISTANCE_TO_INSPECTION':
-				case 'MAINTENANCE_INTERVAL_TIME_TO_INSPECTION':
-					$this->checkAndUpdateCmd($key, $value * -1);
-					break;
-				case 'LOCK_STATE_LEFT_FRONT_DOOR':
-				case 'LOCK_STATE_LEFT_REAR_DOOR':
-				case 'LOCK_STATE_RIGHT_FRONT_DOOR':
-				case 'LOCK_STATE_RIGHT_REAR_DOOR':
-				case 'LOCK_STATE_TRUNK_LID':
-					log::add(__CLASS__, 'debug', "{$key}={$value}");
-					$doorLockState = $value == 2 ? 1 : 0;
-					$vehicleLockState &= $doorLockState;
-					$this->checkAndUpdateCmd($key, $doorLockState);
-					break;
-				case 'OPEN_STATE_LEFT_FRONT_DOOR':
-				case 'OPEN_STATE_LEFT_REAR_DOOR':
-				case 'OPEN_STATE_RIGHT_FRONT_DOOR':
-				case 'OPEN_STATE_RIGHT_REAR_DOOR':
-				case 'OPEN_STATE_TRUNK_LID':
-					log::add(__CLASS__, 'debug', "{$key}={$value}");
-					$doorOpenState = $value == 3 ? 1 : 0;
-					$vehicleOpenState &= $doorOpenState;
-					$this->checkAndUpdateCmd($key, $doorOpenState);
-					break;
-				default:
-					$this->checkAndUpdateCmd($key, $value);
-					break;
-			}
+	private function updateFuelStatus(array $fuelStatus) {
+		if (isset($fuelStatus['range_status']['primary_engine'])) {
+			$primary_engine = $fuelStatus['range_status']['primary_engine'];
+			$this->checkAndUpdateCmd('primary_engine_type', $primary_engine['type']);
+			$this->checkAndUpdateCmd('primary_engine_current_soc_pct', $primary_engine['current_soc_pct']);
+			$this->checkAndUpdateCmd('primary_engine_remaining_range_km', $primary_engine['remaining_range_km']);
+			$this->checkAndUpdateCmd('primary_engine_current_fuel_level_pct', $primary_engine['current_fuel_level_pct']);
 		}
-		log::add(__CLASS__, 'debug', "LOCK_STATE_VEHICLE: {$vehicleLockState}");
-		$this->checkAndUpdateCmd('LOCK_STATE_VEHICLE', $vehicleLockState);
-		log::add(__CLASS__, 'debug', "OPEN_STATE_VEHICLE: {$vehicleOpenState}");
-		$this->checkAndUpdateCmd('OPEN_STATE_VEHICLE', $vehicleOpenState);
+		if (isset($fuelStatus['range_status']['secondary_engine'])) {
+			$secondary_engine = $fuelStatus['range_status']['secondary_engine'];
+			$this->checkAndUpdateCmd('secondary_engine_type', $secondary_engine['type']);
+			$this->checkAndUpdateCmd('secondary_engine_current_soc_pct', $secondary_engine['current_soc_pct']);
+			$this->checkAndUpdateCmd('secondary_engine_remaining_range_km', $secondary_engine['remaining_range_km']);
+			$this->checkAndUpdateCmd('secondary_engine_current_fuel_level_pct', $secondary_engine['current_fuel_level_pct']);
+		}
+		$this->checkAndUpdateCmd('total_range_km', $fuelStatus['range_status']['total_range_km']);
+	}
 
-		$latitude = isset($vehicle['position']['carCoordinate']['latitude']) ? $vehicle['position']['carCoordinate']['latitude'] : '0';
-		$longitude = isset($vehicle['position']['carCoordinate']['longitude']) ? $vehicle['position']['carCoordinate']['longitude'] : '0';
-		$this->checkAndUpdateCmd('LOCATION', "{$latitude},{$longitude}");
+	private function updateCharging(array $charging) {
+		if (isset($charging['charging_status']['charging_state'])) {
+			$this->checkAndUpdateCmd('charging_state', $charging['charging_status']['charging_state']);
+		}
+		if (isset($charging['charging_status']['charge_power_kw'])) {
+			$this->checkAndUpdateCmd('charge_power_kw', $charging['charging_status']['charge_power_kw']);
+		}
+	}
+
+	private function updateVehicleHealthInspection(array $vehicleHealthInspection) {
+		if (isset($vehicleHealthInspection['maintenance_status'])) {
+			$this->checkAndUpdateCmd('inspection_due_days', $vehicleHealthInspection['inspection_due_days']);
+			$this->checkAndUpdateCmd('inspection_due_km', $vehicleHealthInspection['inspection_due_km']);
+			$this->checkAndUpdateCmd('mileage_km', $vehicleHealthInspection['mileage_km']);
+			$this->checkAndUpdateCmd('oil_service_due_days', $vehicleHealthInspection['oil_service_due_days']);
+			$this->checkAndUpdateCmd('oil_service_due_km', $vehicleHealthInspection['oil_service_due_km']);
+		}
 	}
 
 	public function postSave() {
-		$this->refreshWidget();
-	}
-
-	public static function postConfig_googleMapsAPIKey($value) {
-		foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
-			$eqLogic->refreshWidget();
-		}
-	}
-
-	public function refresh() {
-		$params = array('method' => 'getVehicleData', 'vin' => $this->getLogicalId());
-		myaudi::sendToDaemon($params);
-	}
-
-	public function execute_vehicle_action($state) {
-		$params = array(
-			'method' => $state,
-			'vin' => $this->getLogicalId()
-		);
-		myaudi::sendToDaemon($params);
+		$commands = self::getCommandsFileContent(__DIR__ . '/../config/commands.json');
+		// $this->createCommandsFromConfig($commands['vehicle']);
+		$this->createCommandsFromConfig($commands['fuel_status']);
+		$this->createCommandsFromConfig($commands['vehicle_health_inspection']);
 	}
 }
 
 class myaudiCmd extends cmd {
-
-	public static $_widgetPossibility = array(
-		'custom' => array(
-			'widget' => false,
-			'visibility' => true,
-			'displayName' => true,
-			'displayIconAndName' => true,
-			'optionalParameters' => true
-		)
-	);
-
-	public function execute($_options = array()) {
-
-		/** @var myaudi */
-		$eqlogic = $this->getEqLogic();
-
-		switch ($this->getLogicalId()) {
-			case 'refresh':
-				$eqlogic->refresh();
-				break;
-
-			case 'lock':
-				log::add("myaudi", 'debug', "Locking");
-				$eqlogic->execute_vehicle_action('lock');
-				break;
-			case 'unlock':
-				log::add("myaudi", 'debug', "Unlocking");
-				$eqlogic->execute_vehicle_action('unlock');
-				break;
-
-			case 'preheater_start':
-				log::add("myaudi", 'debug', "Preheater start");
-				$eqlogic->execute_vehicle_action('start_preheater');
-				break;
-			case 'preheater_stop':
-				log::add("myaudi", 'debug', "Preheater stop");
-				$eqlogic->execute_vehicle_action('stop_preheater');
-				break;
-
-			case 'charger_start':
-				log::add("myaudi", 'debug', "Charger start");
-				$eqlogic->execute_vehicle_action('start_charger');
-				break;
-			case 'charger_stop':
-				log::add("myaudi", 'debug', "Charger stop");
-				$eqlogic->execute_vehicle_action('stop_charger');
-				break;
-
-			case 'ac_start':
-				log::add("myaudi", 'debug', "Air conditionning start");
-				$eqlogic->execute_vehicle_action('start_climatisation');
-				break;
-			case 'ac_stop':
-				log::add("myaudi", 'debug', "Air conditionning stop");
-				$eqlogic->execute_vehicle_action('stop_climatisation');
-				break;
-
-			case 'defrost_start':
-				log::add("myaudi", 'debug', "Windows defrost start");
-				$eqlogic->execute_vehicle_action('start_window_heating');
-				break;
-			case 'defrost_stop':
-				log::add("myaudi", 'debug', "Windows defrost stop");
-				$eqlogic->execute_vehicle_action('stop_window_heating');
-				break;
-			default:
-				log::add("myaudi", 'debug', "No action attached to " . $this->getLogicalId());
-		}
-	}
-
-	private function locationToHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
-		$version2 = jeedom::versionAlias($_version, false);
-		if ($this->getDisplay('showOn' . $version2, 1) == 0) {
-			return '';
-		}
-
-		$hideCoordinates = 'hidden';
-		$showMap = 1;
-		$mapWidth = 240;
-		$mapHeight = 180;
-		$parameters = $this->getDisplay('parameters');
-		if (is_array($parameters)) {
-			if (isset($parameters['showMap'])) {
-				$showMap = $parameters['showMap'];
-			}
-			if (isset($parameters['showCoordinates']) && $parameters['showCoordinates'] == 1) {
-				$hideCoordinates = '';
-			}
-			if (isset($parameters['mapWidth']) && is_numeric($parameters['mapWidth'])) {
-				$mapWidth = $parameters['mapWidth'];
-			}
-			if (isset($parameters['mapHeight']) && is_numeric($parameters['mapHeight'])) {
-				$mapHeight = $parameters['mapHeight'];
-			}
-		}
-
-		if ($showMap == 0) {
-			log::add('myaudi', 'info', "map not active, default widget used");
-			return parent::toHtml($_version, $_options, $_cmdColor);
-		}
-
-		$apiKey = config::byKey('googleMapsAPIKey', 'myaudi');
-		if ($apiKey == '') {
-			log::add('myaudi', 'info', "no google Maps API Key configured, default widget used");
-			return parent::toHtml($_version, $_options, $_cmdColor);
-		}
-
-		log::add('myaudi', 'debug', "hideCoordinates:{$hideCoordinates} - showMap:{$showMap} - mapWidth:{$mapWidth} - mapHeight:{$mapHeight}");
-
-
-
-		$replace = array(
-			'#id#' => $this->getId(),
-			'#name#' => $this->getName(),
-			'#location#' => $this->execCmd(),
-			'#name_display#' => ($this->getDisplay('icon') != '') ? $this->getDisplay('icon') : $this->getName(),
-			'#history#' => ($this->getIsHistorized() == 1) ? 'history cursor' : '',
-			'#logicalId#' => $this->getLogicalId(),
-			'#uid#' => 'cmd' . $this->getId() . eqLogic::UIDDELIMITER . mt_rand() . eqLogic::UIDDELIMITER,
-			'#version#' => $_version,
-			'#eqLogic_id#' => $this->getEqLogic_id(),
-			'#hideCmdName#' => ($this->getDisplay('showNameOn' . $version2, 1) == 0) ? 'display:none;' : '',
-			'#collectDate#' => $this->getCollectDate(),
-			'#valueDate#' => $this->getValueDate(),
-			'#apiKey#' => $apiKey,
-			'#mapsWidth#' => $mapWidth,
-			'#mapsHeight#' => $mapHeight,
-			'#hideCoordinates#' => $hideCoordinates
-		);
-		if ($this->getDisplay('showIconAndName' . $version2, 0) == 1) {
-			$replace['#name_display#'] = $this->getDisplay('icon') . ' ' . $this->getName();
-		}
-
-		$version = jeedom::versionAlias($_version);
-		$template = getTemplate('core', $version, 'locationCmd', 'myaudi');
-
-		return template_replace($replace, $template);
-	}
-
-	public function toHtml($_version = 'dashboard', $_options = '', $_cmdColor = null) {
-		if ($this->getLogicalId() == 'LOCATION') {
-			return $this->locationToHtml($_version, $_options, $_cmdColor);
-		}
-		return parent::toHtml($_version, $_options, $_cmdColor);
-	}
 }

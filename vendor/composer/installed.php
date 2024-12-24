@@ -1,33 +1,32 @@
-<?php return array (
-  'root' => 
-  array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
-    'aliases' => 
-    array (
+<?php return array(
+    'root' => array(
+        'name' => 'mips/jeedom-myaudi',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => 'de91437a6b9dfcb7e4c5639d2a5ae0a1c718bc03',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
     ),
-    'reference' => 'e14bed89140e12136942f3949f609915a26576c8',
-    'name' => 'mips/jeedom-myaudi',
-  ),
-  'versions' => 
-  array (
-    'mips/jeedom-myaudi' => 
-    array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'e14bed89140e12136942f3949f609915a26576c8',
+    'versions' => array(
+        'mips/jeedom-myaudi' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'de91437a6b9dfcb7e4c5639d2a5ae0a1c718bc03',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'mips/jeedom-tools' => array(
+            'pretty_version' => 'v1.1.1',
+            'version' => '1.1.1.0',
+            'reference' => '5843ad156530cc36f40ff642baabd476219ddb6e',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mips/jeedom-tools',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
     ),
-    'mips/jeedom-tools' => 
-    array (
-      'pretty_version' => 'v1.0',
-      'version' => '1.0.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '047aa5ca7831394566a6974ea7ccc882c04025c8',
-    ),
-  ),
 );

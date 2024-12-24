@@ -1,0 +1,2 @@
+jeedomdaemon~=0.11.2
+audiconnectpy~=2.5.3

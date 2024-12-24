@@ -1,134 +1,125 @@
+import asyncio
 import logging
-import argparse
-import sys
-import os
-import signal
-import json
-import time
+import warnings
+from aiohttp import ClientSession
+from jeedomdaemon.base_daemon import BaseDaemon
+from jeedomdaemon.base_config import BaseConfig
 
-from jeedom.jeedom import jeedom_utils, jeedom_com, jeedom_socket, JEEDOM_SOCKET_MESSAGE
-
-from audiconnect.audi_jeedom_account import AudiAccount
+from audiconnectpy import AudiConnect, AudiException
 
 
-def read_socket():
-    global JEEDOM_SOCKET_MESSAGE
-    if not JEEDOM_SOCKET_MESSAGE.empty():
-        logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
-        message = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode('utf-8'))
-        if message['apikey'] != _apikey:
-            logging.error("Invalid apikey from socket : " + str(message))
-            return
+class AudiConfig(BaseConfig):
+    def __init__(self):
+        super().__init__()
+
+        self.add_argument("--username", type=str)
+        self.add_argument("--password", type=str)
+        self.add_argument("--country", type=str)
+        self.add_argument("--spin", type=str)
+
+    @property
+    def username(self) -> str:
+        return self._args.username
+
+    @property
+    def password(self) -> str:
+        return self._args.password
+
+    @property
+    def country(self) -> str:
+        return self._args.country
+
+    @property
+    def spin(self) -> str:
+        return self._args.spin
+
+
+class MyAudiDaemon(BaseDaemon):
+    def __init__(self):
+        self._config = AudiConfig()
+        super().__init__(self._config, on_start_cb=self.on_start)
+
+        logging.getLogger('audiconnectpy').setLevel(logging.WARNING)
+        warnings.filterwarnings("ignore")
+
+        self._api = None
+
+    async def on_start(self):
+        asyncio.create_task(self.__update_task())
+
+    async def __update_task(self):
         try:
-            if message['method'] == 'getVehicles':
-                try:
-                    AUDI.init_connection()
-                    AUDI.update()
-                except Exception as e:
-                    logging.error('getVehicles error : '+str(e))
-            elif message['method'] == 'getVehicleData':
-                try:
-                    AUDI.init_connection()
-                    AUDI.update()
-                    AUDI.refresh_vehicle_data(message['vin'])
-                except Exception as e:
-                    logging.error('getVehicleData error : '+str(e))
-            elif message['method'] == 'lock' or message['method'] == 'unlock' or message['method'] == 'start_climatisation' or message['method'] == 'stop_climatisation' or message['method'] == 'stop_charger' or message['method'] == 'start_charger' or message['method'] == 'start_preheater' or message['method'] == 'stop_preheater' or message['method'] == 'start_window_heating' or message['method'] == 'stop_window_heating':
-                try:
-                    AUDI.init_connection()
-                    AUDI.update()
-                    AUDI.execute_vehicle_action(message['vin'], message['method'])
-                except Exception as e:
-                    logging.error(message['method'] + ' error : ' + str(e))
+            while True:
+                async with ClientSession() as session:
+                    self._api = AudiConnect(session, self._config.username, self._config.password, self._config.country, self._config.spin)
+                    try:
+                        await self._api.async_login()
+                    except AudiException as error:
+                        self._logger.error(error)
 
-            else:
-                logging.error("unknown method:" + str(message['method']))
-        except Exception as e:
-            logging.error('Send command to demon error : '+str(e))
+                    if self._api.is_connected:
+                        self._logger.info("Connected to MyAudi API")
+                        try:
+                            for vehicle in self._api.vehicles:
+                                data = {
+                                    "vin": vehicle.vin,
+                                    "infos": vehicle.infos,
+                                    # "capabilities": vehicle.capabilities,
+                                    "fuel_status": vehicle.fuel_status,
+                                    # "last_access": vehicle.last_access,
+                                    # "position": vehicle.position,
+                                    # "location": vehicle.location,
+                                    # "access": vehicle.access,
+                                    "charging": vehicle.charging,
+                                    "climatisation": vehicle.climatisation,
+                                    # "climatisation_timers": vehicle.climatisation_timers,
+                                    # "oil_level": vehicle.oil_level,
+                                    "vehicle_lights": vehicle.vehicle_lights,
+                                    "vehicle_health_inspection": vehicle.vehicle_health_inspection,
+                                    # "measurements": vehicle.measurements,
+                                    "vehicle_health_warnings": vehicle.vehicle_health_warnings
+                                }
+                                await self.add_change(f"vehicle::{vehicle.vin}", data)
+
+                                self._logger.info(vehicle.vin)
+                                self._logger.info(vehicle.infos)
+                                self._logger.info(vehicle.fuel_status)
+                                self._logger.info(vehicle.last_access)
+                                self._logger.info(vehicle.position)
+                                # self._logger.info(vehicle.location)
+                                self._logger.info(vehicle.access)
+                                self._logger.info(vehicle.charging)
+                                self._logger.info(vehicle.climatisation)
+                                self._logger.info(vehicle.climatisation_timers)
+                                self._logger.info(vehicle.oil_level)
+                                self._logger.info(vehicle.vehicle_lights)
+                                self._logger.info(vehicle.vehicle_health_inspection)
+                                self._logger.info(vehicle.measurements)
+                                self._logger.info(vehicle.vehicle_health_warnings)
+                                self._logger.info(vehicle.infos)
+
+                                # Lock vehicle if spin
+                                # --------------------
+                                # await vehicle.async_set_lock(True)
+
+                                # Refresh call remote vehicle
+                                # --------------------
+                                # await vehicle.async_refresh_vehicle_data()
+                                # await vehicle.async_wakeup()
+
+                                # Update Audi API
+                                # --------------------
+                                # await vehicle.async_update()
+
+                        except AudiException as error:
+                            self._logger.error(error)
+                        finally:
+                            await asyncio.sleep(600)
+                    else:
+                        self._logger.error()("Connection error, retry in 120 seconds")
+                        asyncio.sleep(120)
+        except asyncio.CancelledError:
+            self._logger.info("stop auto update")
 
 
-def listen():
-    logging.debug("Start listening")
-    jeedomSocket.open()
-    try:
-        while 1:
-            time.sleep(0.01)
-            read_socket()
-    except KeyboardInterrupt:
-        shutdown()
-
-# ----------------------------------------------------------------------------
-
-
-def handler(signum=None, frame=None):
-    logging.debug("Signal %i caught, exiting..." % int(signum))
-    shutdown()
-
-
-def shutdown():
-    logging.debug("Shutdown")
-    logging.debug("Removing PID file " + str(_pidfile))
-    try:
-        os.remove(_pidfile)
-    except:
-        pass
-    try:
-        jeedomSocket.close()
-    except:
-        pass
-    logging.debug("Exit 0")
-    sys.stdout.flush()
-    os._exit(0)
-
-# ----------------------------------------------------------------------------
-
-
-_log_level = "error"
-_socket_port = 55066
-_pidfile = '/tmp/myaudid.pid'
-_apikey = ''
-_callback = ''
-
-parser = argparse.ArgumentParser(description='Daemon for Jeedom plugin')
-parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
-parser.add_argument("--user", help="username", type=str)
-parser.add_argument("--pswd", help="password", type=str)
-parser.add_argument("--spin", help="S-PIN", type=str)
-parser.add_argument("--country", help="country", type=str)
-parser.add_argument("--socketport", help="Socket Port", type=int)
-parser.add_argument("--callback", help="Value to write", type=str)
-parser.add_argument("--apikey", help="Value to write", type=str)
-parser.add_argument("--pid", help="Value to write", type=str)
-args = parser.parse_args()
-
-_log_level = args.loglevel
-_socket_port = args.socketport
-_pidfile = args.pid
-_apikey = args.apikey
-_callback = args.callback
-
-jeedom_utils.set_log_level(_log_level)
-
-logging.info('Start daemon')
-logging.info('Log level : '+str(_log_level))
-logging.debug('Socket port : '+str(_socket_port))
-logging.debug('PID file : '+str(_pidfile))
-logging.debug('country : '+str(args.country))
-
-signal.signal(signal.SIGINT, handler)
-signal.signal(signal.SIGTERM, handler)
-
-try:
-    jeedom_utils.write_pid(str(_pidfile))
-    jeedomSocket = jeedom_socket(port=_socket_port)
-    jeedomCom = jeedom_com(apikey=_apikey, url=_callback)
-
-    AUDI = AudiAccount(args.user, args.pswd, args.country, args.spin, jeedomCom)
-    AUDI.init_connection()
-    AUDI.update()
-
-    listen()
-except Exception as e:
-    logging.error('Fatal error : '+str(e))
-
-shutdown()
+MyAudiDaemon().run()
