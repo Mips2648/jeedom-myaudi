@@ -102,7 +102,7 @@ class MyAudiDaemon(BaseDaemon):
                         finally:
                             await asyncio.sleep(600)
                     else:
-                        self._logger.error()("Connection error, retry in 120 seconds")
+                        self._logger.error("Connection error, retry in 120 seconds")
                         asyncio.sleep(120)
         except asyncio.CancelledError:
             self._logger.info("stop auto update")
