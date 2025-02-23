@@ -61,42 +61,28 @@ class MyAudiDaemon(BaseDaemon):
                         self._logger.info("Connected to MyAudi API")
                         try:
                             for vehicle in self._api.vehicles:
-                                data = {
-                                    "vin": vehicle.vin,
-                                    "infos": vehicle.infos,
-                                    # "capabilities": vehicle.capabilities,
-                                    "fuel_status": vehicle.fuel_status,
-                                    # "last_access": vehicle.last_access,
-                                    # "position": vehicle.position,
-                                    # "location": vehicle.location,
-                                    # "access": vehicle.access,
-                                    "charging": vehicle.charging,
-                                    "climatisation": vehicle.climatisation,
-                                    # "climatisation_timers": vehicle.climatisation_timers,
-                                    # "oil_level": vehicle.oil_level,
-                                    "vehicle_lights": vehicle.vehicle_lights,
-                                    "vehicle_health_inspection": vehicle.vehicle_health_inspection,
-                                    # "measurements": vehicle.measurements,
-                                    "vehicle_health_warnings": vehicle.vehicle_health_warnings
-                                }
-                                await self.add_change(f"vehicle::{vehicle.vin}", data)
-
-                                self._logger.info(vehicle.vin)
-                                self._logger.info(vehicle.infos)
-                                self._logger.info(vehicle.fuel_status)
-                                self._logger.info(vehicle.last_access)
-                                self._logger.info(vehicle.position)
-                                # self._logger.info(vehicle.location)
-                                self._logger.info(vehicle.access)
-                                self._logger.info(vehicle.charging)
-                                self._logger.info(vehicle.climatisation)
-                                self._logger.info(vehicle.climatisation_timers)
-                                self._logger.info(vehicle.oil_level)
-                                self._logger.info(vehicle.vehicle_lights)
-                                self._logger.info(vehicle.vehicle_health_inspection)
-                                self._logger.info(vehicle.measurements)
-                                self._logger.info(vehicle.vehicle_health_warnings)
-                                self._logger.info(vehicle.infos)
+                                try:
+                                    data = {
+                                        "vin": vehicle.vin,
+                                        "infos": vehicle.infos,
+                                        # "capabilities": vehicle.capabilities,
+                                        "fuel_status": vehicle.fuel_status,
+                                        # "last_access": vehicle.last_access,
+                                        # "position": vehicle.position,
+                                        # "location": vehicle.location,
+                                        # "access": vehicle.access,
+                                        "charging": vehicle.charging,
+                                        # "climatisation": vehicle.climatisation,
+                                        # "climatisation_timers": vehicle.climatisation_timers,
+                                        # "oil_level": vehicle.oil_level,
+                                        # "vehicle_lights": vehicle.vehicle_lights,
+                                        "vehicle_health_inspection": vehicle.vehicle_health_inspection,
+                                        # "measurements": vehicle.measurements,
+                                        # "vehicle_health_warnings": vehicle.vehicle_health_warnings
+                                    }
+                                    await self.add_change(f"vehicle::{vehicle.vin}", data)
+                                except Exception as error:
+                                    self._logger.error("Impossible to get data for vehicle %s: %s ", vehicle, error)
 
                                 # Lock vehicle if spin
                                 # --------------------
@@ -116,7 +102,7 @@ class MyAudiDaemon(BaseDaemon):
                         finally:
                             await asyncio.sleep(600)
                     else:
-                        self._logger.error()("Connection error, retry in 120 seconds")
+                        self._logger.error("Connection error, retry in 120 seconds")
                         asyncio.sleep(120)
         except asyncio.CancelledError:
             self._logger.info("stop auto update")

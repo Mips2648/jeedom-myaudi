@@ -184,11 +184,11 @@ class myaudi extends eqLogic {
 
 	private function updateVehicleHealthInspection(array $vehicleHealthInspection) {
 		if (isset($vehicleHealthInspection['maintenance_status'])) {
-			$this->checkAndUpdateCmd('inspection_due_days', $vehicleHealthInspection['inspection_due_days']);
-			$this->checkAndUpdateCmd('inspection_due_km', $vehicleHealthInspection['inspection_due_km']);
-			$this->checkAndUpdateCmd('mileage_km', $vehicleHealthInspection['mileage_km']);
-			$this->checkAndUpdateCmd('oil_service_due_days', $vehicleHealthInspection['oil_service_due_days']);
-			$this->checkAndUpdateCmd('oil_service_due_km', $vehicleHealthInspection['oil_service_due_km']);
+			$this->checkAndUpdateCmd('inspection_due_days', $vehicleHealthInspection['maintenance_status']['inspection_due_days']);
+			$this->checkAndUpdateCmd('inspection_due_km', $vehicleHealthInspection['maintenance_status']['inspection_due_km']);
+			$this->checkAndUpdateCmd('mileage_km', $vehicleHealthInspection['maintenance_status']['mileage_km']);
+			$this->checkAndUpdateCmd('oil_service_due_days', $vehicleHealthInspection['maintenance_status']['oil_service_due_days']);
+			$this->checkAndUpdateCmd('oil_service_due_km', $vehicleHealthInspection['maintenance_status']['oil_service_due_km']);
 		}
 	}
 
