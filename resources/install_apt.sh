@@ -1,5 +1,5 @@
 ######################### INCLUSION LIB ##########################
-BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+BASE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 wget https://raw.githubusercontent.com/Mips2648/dependance.lib/master/dependance.lib --no-cache -O ${BASE_DIR}/dependance.lib &>/dev/null
 PLUGIN=$(basename "$(realpath ${BASE_DIR}/..)")
 LANG_DEP=en
