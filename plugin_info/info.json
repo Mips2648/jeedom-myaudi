@@ -9,7 +9,7 @@
 		"it_IT": "Plugin per la connessione a My Audi connect",
 		"pt_PT": "Plugin para ligação ao My Audi connect"
 	},
-	"utilization": "",
+	"utilization": "Attention, il n'est plus possible d'installer les dépendances de ce plugin pour l'instant car la librairie utilisée pour la connexion à My Audi connect a été retirée des dépots. Vous pouvez cependant continuer à utiliser le plugin si vous l'avez déjà installé.",
 	"licence": "AGPL",
 	"author": "Mips",
 	"require": "4.3",
