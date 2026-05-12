@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e96d857d0fcbac68cfd34adfa3572c4",
+    "content-hash": "222b337ec0cd20c94e857fc29b1d3b6b",
     "packages": [
         {
             "name": "mips/jeedom-tools",
-            "version": "v1.1.1",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mips2648/jeedom-tools.git",
-                "reference": "5843ad156530cc36f40ff642baabd476219ddb6e"
+                "reference": "7269ccae1b17d664bbb2371c825846a246dd8ef7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/5843ad156530cc36f40ff642baabd476219ddb6e",
-                "reference": "5843ad156530cc36f40ff642baabd476219ddb6e",
+                "url": "https://api.github.com/repos/Mips2648/jeedom-tools/zipball/7269ccae1b17d664bbb2371c825846a246dd8ef7",
+                "reference": "7269ccae1b17d664bbb2371c825846a246dd8ef7",
                 "shasum": ""
             },
             "require-dev": {
@@ -41,9 +41,9 @@
             "description": "Jeedom tools for plugin dev",
             "support": {
                 "issues": "https://github.com/Mips2648/jeedom-tools/issues",
-                "source": "https://github.com/Mips2648/jeedom-tools/tree/v1.1.1"
+                "source": "https://github.com/Mips2648/jeedom-tools/tree/v2.0.1"
             },
-            "time": "2024-11-29T13:20:26+00:00"
+            "time": "2026-01-28T08:59:18+00:00"
         }
     ],
     "packages-dev": [],
