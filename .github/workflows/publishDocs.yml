@@ -1,0 +1,16 @@
+name: Publish docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - beta
+    paths:
+      - "docs/**"
+
+jobs:
+  publish:
+    uses: Mips2648/jeedom-plugins-docs/.github/workflows/publish-plugin-docs.yml@master
+    secrets:
+      docs_repo_token: ${{ secrets.DOCS_REPO_TOKEN }}
