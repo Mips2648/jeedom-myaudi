@@ -6,6 +6,11 @@ on:
   push:
     branches:
       - beta
+    paths:
+      - 'core/**'
+      - 'desktop/**'
+      - 'mobile/**'
+      - 'plugin_info/**'
 
 jobs:
   auto-translate:
